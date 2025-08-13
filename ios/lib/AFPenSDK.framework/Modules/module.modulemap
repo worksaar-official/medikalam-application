@@ -1,0 +1,6 @@
+framework module AFPenSDK {
+  umbrella header "AFPenSDK.h"
+  export *
+
+  module * { export * }
+}

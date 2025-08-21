@@ -55,3 +55,6 @@ ios/build/
 ios/Flutter/Flutter.framework.dSYM/
 ios/.symlinks/
 *.dSYM
+
+# FVM Version Cache
+.fvm/build/

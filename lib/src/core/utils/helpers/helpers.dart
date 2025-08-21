@@ -16,7 +16,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // Project imports:
-import 'package:Medikalam/main.dart';
+import 'package:get_it/get_it.dart';
+import 'package:Medikalam/services/routing/app_router.dart';
 import 'package:Medikalam/services/routing/utils/extensions/screen_name_extension.dart';
 import 'package:Medikalam/src/core/errors/exception.dart';
 import 'package:Medikalam/src/core/errors/failures.dart';
@@ -47,7 +48,8 @@ class Helpers {
   static Future<List<String>?> pickFile_Android() async {
     final result = await ImagePicker().pickMultiImage();
     return result.map((e) => e.path).toList();
-    }
+  }
+
   static Future<Map<String, dynamic>> getApiHeaders() async {
     final headers = <String, dynamic>{
       'Content-Type': 'application/json' 'charset=utf-8',
@@ -174,10 +176,11 @@ class Helpers {
       } else if (response.statusCode == 401) {
         showError("Session Expired");
         await Helpers.clearShared();
-        while (router.canPop()) {
-          router.pop();
+        final appRouter = GetIt.I<AppRouter>().router;
+        while (appRouter.canPop()) {
+          appRouter.pop();
         }
-        router.replaceNamed(AppScreens.landing.name);
+        appRouter.replaceNamed(AppScreens.landing.name);
       } else {
         throw ServerException(
           code: response.statusCode,

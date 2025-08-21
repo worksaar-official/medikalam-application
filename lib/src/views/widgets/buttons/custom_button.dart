@@ -64,10 +64,17 @@ class CustomButtonNew extends StatelessWidget {
         padding: padding,
         margin: margin,
         decoration: BoxDecoration(
-          boxShadow: shadows,
+          boxShadow: shadows ??
+              [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
           color: color ?? AppColors.btnPrimary,
           border: Border.all(color: Colors.transparent),
-          borderRadius: BorderRadius.circular(borderRadius ?? 10.0),
+          borderRadius: BorderRadius.circular(borderRadius ?? 12.0),
         ),
         child:
             child ?? (status != null ? _handleState(context) : _btn(context)),

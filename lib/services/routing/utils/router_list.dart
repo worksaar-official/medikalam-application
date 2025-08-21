@@ -65,12 +65,22 @@ final List<GoRoute> routerList = [
     path: AppScreens.patientLanding.path,
     name: AppScreens.patientLanding.name,
     pageBuilder: (context, state) {
-      final extra = state.extra as Map<String, dynamic>;
+      final dynamic extra = state.extra;
+      OperationMode operationMode = OperationMode.render;
+      bool showBottomSheet = false;
+
+      if (extra is Map<String, dynamic>) {
+        operationMode =
+            extra['operationMode'] as OperationMode? ?? OperationMode.render;
+        showBottomSheet = extra['showBottomSheet'] as bool? ?? false;
+      } else if (extra is OperationMode) {
+        operationMode = extra;
+      }
 
       return _createPage(
         PatientLandingPage(
-          operationMode: extra['operationMode'] ?? OperationMode.render,
-          showBottomSheet: extra['showBottomSheet'] ?? false,
+          operationMode: operationMode,
+          showBottomSheet: showBottomSheet,
         ),
       );
     },

@@ -63,8 +63,6 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-final router = getIt<AppRouter>().router;
-
 class _MyAppState extends State<MyApp> {
   @override
   void initState() {
@@ -90,7 +88,7 @@ class _MyAppState extends State<MyApp> {
               supportedLocales: const [Locale('en', 'US')],
               theme: ApplicationTheme.lightTheme,
               debugShowCheckedModeBanner: false,
-              routerConfig: router,
+              routerConfig: getIt<AppRouter>().router,
               builder: EasyLoading.init(),
             ),
           ),

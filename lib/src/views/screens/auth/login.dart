@@ -2,6 +2,7 @@
 
 // Flutter imports:
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 // Package imports:
 import 'package:gap/gap.dart';
@@ -84,6 +85,20 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ),
+                      if (kDebugMode)
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: TextButton(
+                            onPressed: () {
+                              final form = provider.loginForm;
+                              form
+                                  .control('email')
+                                  .updateValue('example@gmail.com');
+                              form.control('password').updateValue('ashray123');
+                            },
+                            child: const Text('Autofill (temp)'),
+                          ),
+                        ),
                       const Spacer(),
                       CustomButtonNew(
                           status: provider.getSubmissionStatus,

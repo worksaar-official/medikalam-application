@@ -48,20 +48,20 @@ class FormProvider extends ChangeNotifier {
 
   final FormGroup registrationForm = FormGroup({
     'number': FormControl<String>(
-      validators: [Validators.required, Validators.number()],
+      validators: [
+        Validators.required,
+        Validators.number(),
+        Validators.minLength(10),
+        Validators.maxLength(10),
+      ],
     ),
     'name': FormControl<String>(
       validators: [
         Validators.required,
       ],
     ),
-    'dateofbirth': FormControl<String>(
-      validators: [Validators.required, Validators.number()],
-    ),
+    'dateofbirth': FormControl<String>(),
     'year': FormControl<String>(
-      validators: [Validators.required, Validators.number()],
-    ),
-    'month': FormControl<String>(
       validators: [Validators.required, Validators.number()],
     ),
   });

@@ -39,6 +39,7 @@ class HelperContainer extends StatelessWidget {
               style: style ??
                   context.textTheme.bodyLarge?.copyWith(
                     color: AppColors.txtLabel,
+                    fontWeight: FontWeight.w700,
                   ),
               overflow: TextOverflow.ellipsis,
             ),

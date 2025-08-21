@@ -10,13 +10,13 @@
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3900C8F22E572A600062985F /* AFPenSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3900C8F12E572A600062985F /* AFPenSDK.framework */; };
+		3993F30D2E575AAA0044D71E /* AFPenSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3900C8F12E572A600062985F /* AFPenSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		B10A651E2C99746700657758 /* AFPenSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B10A651D2C99746700657758 /* AFPenSDK.framework */; };
-		B10A651F2C99746700657758 /* AFPenSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B10A651D2C99746700657758 /* AFPenSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B10A65212C9AD61F00657758 /* AFNodeDataType.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10A65202C9AD61F00657758 /* AFNodeDataType.swift */; };
 		B10A65232C9AD66600657758 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10A65222C9AD66600657758 /* Util.swift */; };
 		D8C1F83BB9C7F8B86A7969F1 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49DE4CCBD7C3C1D8B9B707BC /* Pods_Runner.framework */; };
@@ -40,7 +40,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				B10A651F2C99746700657758 /* AFPenSDK.framework in Embed Frameworks */,
+				3993F30D2E575AAA0044D71E /* AFPenSDK.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -740,6 +740,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/lib",
 					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/Runner/**",
 				);
 				INFOPLIST_FILE = Runner/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Medikalam;

@@ -36,7 +36,7 @@ class _RegisterVisitPageState extends State<RegisterVisitPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: const Color(0xFFF8FAFC),
       resizeToAvoidBottomInset: true,
       appBar: backAppbar(context, 'Register Visit'),
       body: SingleChildScrollView(
@@ -45,82 +45,108 @@ class _RegisterVisitPageState extends State<RegisterVisitPage> {
             return ReactiveForm(
               formGroup: context.read<FormProvider>().registrationForm,
               child: Padding(
-                padding: const EdgeInsets.all(13),
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Register by',
-                      style: context.textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                        color: AppColors.blackColor,
-                      ),
-                    ),
-                    SizedBox(height: 1.h),
-                    // CustomRadioButton(
-                    //   selectedIndex: provider.selectedIndex,
-                    //   index: 0,
-                    //   label: 'Mobile Number',
-                    //   onChanged: (v) => provider.selectRadio(v),
-                    // ),
-                    // CustomRadioButton(
-                    //   index: 1,
-                    //   label: 'Registration Number',
-                    //   onChanged: (value) {
-                    //     provider.selectRadio(value);
-                    //   },
-                    //   selectedIndex: provider.selectedIndex,
-                    // ),
-                    SizedBox(
-                      height: 2.h,
-                    ),
-                    HelperContainer(
-                      title: 'Mobile Number',
-                      widget: CustomTextfield(
-                        hintText: 'XXXXXXXXXX',
-                        formControlName: 'number',
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(10),
-                        ],
-                        prefixWidget: Padding(
-                          padding: const EdgeInsets.only(left: 12, right: 6),
-                          child: Text(
-                            '+91',
-                            style: context.textTheme.labelLarge
-                                ?.copyWith(color: AppColors.documentColor),
+                    // Header section with simple styling
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
                           ),
-                        ),
+                        ],
                       ),
-                    ),
-                    SizedBox(width: 4.w),
-                    const HelperContainer(
-                      title: 'Patient Name',
-                      widget: CustomTextfield(
-                        hintText: 'Enter your name',
-                        keyboardType: TextInputType.name,
-                        formControlName: 'name',
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(3),
-                            child: HelperContainer(
-                              title: 'Year of Birth',
-                              widget: CustomTextfield(
-                                hintText: 'e.g. 1999',
-                                keyboardType: TextInputType.number,
-                                formControlName: 'year',
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly,
-                                  LengthLimitingTextInputFormatter(4),
-                                ],
-                                suffixWidget:
-                                    ReactiveValueListenableBuilder<String>(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color:
+                                      const Color(0xFF2563EB).withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.medical_services_rounded,
+                                  color: Color(0xFF2563EB),
+                                  size: 20,
+                                ),
+                              ),
+                              SizedBox(width: 3.w),
+                              Text(
+                                'Patient Registration',
+                                style: context.textTheme.displaySmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  color: const Color(0xFF1E293B),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 1.2.h),
+
+                          // Mobile Number field
+                          HelperContainer(
+                            title: 'Mobile Number',
+                            widget: CustomTextfield(
+                              hintText: 'XXXXXXXXXX',
+                              formControlName: 'number',
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(10),
+                              ],
+                              prefixWidget: Container(
+                                padding:
+                                    const EdgeInsets.only(left: 8, right: 8),
+                                child: Text(
+                                  '+91',
+                                  style: context.textTheme.bodyLarge?.copyWith(
+                                    color: const Color(0xFF2563EB),
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(height: 1.2.h),
+
+                          // Patient Name field
+                          const HelperContainer(
+                            title: 'Patient Name',
+                            widget: CustomTextfield(
+                              hintText: 'Enter patient name',
+                              keyboardType: TextInputType.name,
+                              formControlName: 'name',
+                            ),
+                          ),
+
+                          SizedBox(height: 1.2.h),
+
+                          // Year of Birth with age calculation
+                          HelperContainer(
+                            title: 'Year of Birth',
+                            widget: CustomTextfield(
+                              hintText: 'e.g. 1999',
+                              keyboardType: TextInputType.number,
+                              formControlName: 'year',
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(4),
+                              ],
+                              suffixWidget: Container(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: ReactiveValueListenableBuilder<String>(
                                   formControlName: 'year',
                                   builder: (context, control, child) {
                                     final String? y = control.value;
@@ -131,15 +157,27 @@ class _RegisterVisitPageState extends State<RegisterVisitPage> {
                                         age = 2025 - p;
                                       }
                                     }
-                                    return Padding(
-                                      padding: const EdgeInsets.only(right: 8),
+                                    return Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: age != null
+                                            ? const Color(0xFF10B981)
+                                                .withOpacity(0.1)
+                                            : const Color(0xFF6B7280)
+                                                .withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
                                       child: Text(
-                                        age != null
-                                            ? '|  Age: $age'
-                                            : '|  Age: --',
-                                        style: context.textTheme.bodyMedium
+                                        age != null ? 'Age: $age' : 'Age: --',
+                                        style: context.textTheme.bodySmall
                                             ?.copyWith(
-                                                color: AppColors.txtSecondary),
+                                          color: age != null
+                                              ? const Color(0xFF10B981)
+                                              : const Color(0xFF6B7280),
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 11,
+                                        ),
                                       ),
                                     );
                                   },
@@ -147,84 +185,214 @@ class _RegisterVisitPageState extends State<RegisterVisitPage> {
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    // Age now shown inline in the Year of Birth field suffix and updates reactively
-                    // Removed extra DOB display section and the 'Or' divider as per request
-                    Text(
-                      ' Select Gender',
-                      style: context.textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                        color: AppColors.blackColor,
+                        ],
                       ),
                     ),
-                    CustomRadioButton(
-                      selectedValue: provider.selectedIndex,
-                      label: 'Male',
-                      onChanged: (v) => provider.selectRadio(v),
-                      value: "M",
-                    ),
-                    CustomRadioButton(
-                      selectedValue: provider.selectedIndex,
-                      label: 'Female',
-                      onChanged: (v) => provider.selectRadio(v),
-                      value: "F",
-                    ),
-                    SizedBox(
-                      height: 2.h,
-                    ),
-                    SizedBox(height: 1.h),
-                    
-                    // Old Prescription and Old Report buttons moved above Connect button
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            height: 14.h,
-                            margin: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: AppColors.offWhite,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppColors.borderColor),
-                            ),
-                            child: Center(
-                              child: Text('Old Prescription Image',
-                                  style: context.textTheme.bodySmall
-                                      ?.copyWith(color: AppColors.txtLabel)),
-                            ),
+
+                    SizedBox(height: 1.5.h),
+
+                    // Gender selection with simple styling
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
                           ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            height: 14.h,
-                            margin: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: AppColors.offWhite,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: AppColors.borderColor),
-                            ),
-                            child: Center(
-                              child: Text('Old Report Image',
-                                  style: context.textTheme.bodySmall
-                                      ?.copyWith(color: AppColors.txtLabel)),
-                            ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color:
+                                      const Color(0xFF7C3AED).withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.person_rounded,
+                                  color: Color(0xFF7C3AED),
+                                  size: 20,
+                                ),
+                              ),
+                              SizedBox(width: 3.w),
+                              Text(
+                                'Patient Gender',
+                                style: context.textTheme.displaySmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  color: const Color(0xFF1E293B),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 1.h),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: CustomRadioButton(
+                                  selectedValue: provider.selectedIndex,
+                                  label: 'Male',
+                                  onChanged: (v) => provider.selectRadio(v),
+                                  value: "M",
+                                ),
+                              ),
+                              SizedBox(width: 2.w),
+                              Expanded(
+                                child: CustomRadioButton(
+                                  selectedValue: provider.selectedIndex,
+                                  label: 'Female',
+                                  onChanged: (v) => provider.selectRadio(v),
+                                  value: "F",
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                    
+
+                    SizedBox(height: 1.5.h),
+
+                    // Medical Documents section with simple design
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color:
+                                      const Color(0xFF059669).withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.folder_rounded,
+                                  color: Color(0xFF059669),
+                                  size: 20,
+                                ),
+                              ),
+                              SizedBox(width: 3.w),
+                              Text(
+                                'Medical Documents',
+                                style: context.textTheme.displaySmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  color: const Color(0xFF1E293B),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 1.h),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  height: 8.h,
+                                  margin: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF0F9FF),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                        color: const Color(0xFF0EA5E9)
+                                            .withOpacity(0.2),
+                                        width: 1),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.description_outlined,
+                                        size: 20,
+                                        color: const Color(0xFF0EA5E9),
+                                      ),
+                                      SizedBox(height: 0.5.h),
+                                      Text(
+                                        'Previous Prescription',
+                                        style: context.textTheme.bodySmall
+                                            ?.copyWith(
+                                          color: const Color(0xFF0C4A6E),
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: Container(
+                                  height: 8.h,
+                                  margin: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF0FDF4),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                        color: const Color(0xFF10B981)
+                                            .withOpacity(0.2),
+                                        width: 1),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.assessment_outlined,
+                                        size: 20,
+                                        color: const Color(0xFF10B981),
+                                      ),
+                                      SizedBox(height: 0.5.h),
+                                      Text(
+                                        'Medical Reports',
+                                        style: context.textTheme.bodySmall
+                                            ?.copyWith(
+                                          color: const Color(0xFF064E3B),
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 11,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+
                     SizedBox(height: 2.h),
-                    
-                    // Connect button with QR scanning functionality
+
+                    // Connect button with simple styling
                     CustomButtonNew(
-                      text: 'Connect',
-                      color: AppColors.green,
+                      text: 'Connect & Scan QR',
+                      color: const Color(0xFF2563EB),
                       borderRadius: 12,
                       style: context.textTheme.labelLarge?.copyWith(
                         color: Colors.white,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
                       ),
                       onTap: () {
                         // Navigate to QR scanner
@@ -236,10 +404,8 @@ class _RegisterVisitPageState extends State<RegisterVisitPage> {
                         );
                       },
                     ),
-                    
-                    SizedBox(
-                      height: 7.h,
-                    ),
+
+                    SizedBox(height: 2.h),
                   ],
                 ),
               ),

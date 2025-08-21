@@ -12,45 +12,45 @@ import 'package:Medikalam/src/core/utils/constants/colors.dart';
 import 'package:Medikalam/src/core/utils/constants/extensions.dart';
 
 class CustomTextfield extends StatefulWidget {
-  const CustomTextfield({
-    this.labelText,
-    super.key,
-    this.formControlName,
-    this.keyboardType = TextInputType.text,
-    this.isPassword = false,
-    this.hintStyle,
-    this.validator,
-    this.onChanged,
-    this.onEditingComplete,
-    this.onSaved,
-    this.focusNode,
-    this.onTap,
-    this.textInputAction = TextInputAction.next,
-    this.hintText,
-    this.suffixIcon,
-    this.prefixIcon,
-    this.prefixWidget,
-    this.enabled = true,
-    this.readOnly = false,
-    this.controller,
-    this.backgroundColor,
-    this.borderColor,
-    this.lines = 1,
-    this.height = 40,
-    this.inputFormatters,
-    this.validationMessages,
-    this.maxLines,
-    this.style,
-    this.fillColor,
-    this.contentPadding,
-    this.enabledBorder,
-    this.focusedBorder,
-    this.borderRadius,
-    this.icon,
-    this.type,
-    this.prefIcon,
-    this.onFieldTap
-  });
+  const CustomTextfield(
+      {this.labelText,
+      super.key,
+      this.formControlName,
+      this.keyboardType = TextInputType.text,
+      this.isPassword = false,
+      this.hintStyle,
+      this.validator,
+      this.onChanged,
+      this.onEditingComplete,
+      this.onSaved,
+      this.focusNode,
+      this.onTap,
+      this.textInputAction = TextInputAction.next,
+      this.hintText,
+      this.suffixIcon,
+      this.prefixIcon,
+      this.prefixWidget,
+      this.enabled = true,
+      this.readOnly = false,
+      this.controller,
+      this.backgroundColor,
+      this.borderColor,
+      this.lines = 1,
+      this.height = 40,
+      this.inputFormatters,
+      this.validationMessages,
+      this.maxLines,
+      this.style,
+      this.fillColor,
+      this.contentPadding,
+      this.enabledBorder,
+      this.focusedBorder,
+      this.borderRadius,
+      this.icon,
+      this.type,
+      this.prefIcon,
+      this.onFieldTap,
+      this.suffixWidget});
 
   final String? formControlName;
   final String? labelText;
@@ -88,6 +88,7 @@ class CustomTextfield extends StatefulWidget {
   final IconData? icon;
   final IconData? prefIcon;
   final Function(FormControl<dynamic>)? onFieldTap;
+  final Widget? suffixWidget;
 
   @override
   State<CustomTextfield> createState() => _CustomTextfieldState();
@@ -123,25 +124,29 @@ class _CustomTextfieldState extends State<CustomTextfield> {
         isDense: true,
         hintText: widget.hintText,
         filled: true,
-        fillColor: widget.fillColor ?? Colors.white,
+        fillColor: widget.fillColor ?? AppColors.white,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
-            10,
+            12,
           ),
           borderSide: BorderSide(color: AppColors.lightGrey),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
-            10,
+            12,
           ),
-          borderSide: BorderSide(color: AppColors.lightGrey),
+          borderSide: BorderSide(color: AppColors.borderColor),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
-            10,
+            12,
           ),
-          borderSide: BorderSide(color: AppColors.lightGrey),
+          borderSide: BorderSide(color: AppColors.txtPrimary, width: 1.4),
         ),
+        prefix: widget.prefixWidget,
+        suffix: widget.suffixWidget,
         prefixIcon: widget.prefIcon != null
             ? Icon(
                 widget.prefIcon,

@@ -47,7 +47,7 @@ class FormProvider extends ChangeNotifier {
   });
 
   final FormGroup registrationForm = FormGroup({
-    'number': FormControl<String>(
+    'mobile': FormControl<String>(
       validators: [
         Validators.required,
         Validators.number(),
@@ -55,7 +55,7 @@ class FormProvider extends ChangeNotifier {
         Validators.maxLength(10),
       ],
     ),
-    'name': FormControl<String>(
+    'patientName': FormControl<String>(
       validators: [
         Validators.required,
       ],

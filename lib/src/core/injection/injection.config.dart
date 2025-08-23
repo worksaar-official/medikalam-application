@@ -30,6 +30,10 @@ import 'package:Medikalam/services/api/prescription/prescription_repo.dart'
     as _i546;
 import 'package:Medikalam/services/api/prescription/prescription_repo_impl.dart'
     as _i636;
+import 'package:Medikalam/services/api/attachments/attachment_repo.dart'
+    as _i1051;
+import 'package:Medikalam/services/api/attachments/attachment_repo_impl.dart'
+    as _i1052;
 import 'package:Medikalam/src/core/injection/image_service.dart' as _i1005;
 import 'package:Medikalam/src/providers/appointment/appointment_provider.dart'
     as _i617;
@@ -69,8 +73,10 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i532.PermissionListenerProvider());
     gh.factory<_i951.AudioProvider>(() => _i951.AudioProvider());
     gh.factory<_i716.PrescriptionProvider>(() => _i716.PrescriptionProvider());
-    gh.factory<_i690.RegistrationProvider>(() => _i690.RegistrationProvider());
+    gh.factory<_i690.RegistrationProvider>(
+        () => _i690.RegistrationProvider(gh<_i1051.AttachmentRepo>()));
     gh.lazySingleton<_i1005.ImageService>(() => _i1005.ImageService());
+    gh.lazySingleton<_i1051.AttachmentRepo>(() => _i1052.AttachmentRepoImpl());
     gh.lazySingleton<_i1022.DashboardRepo>(() => _i70.DashboardRepoImpl());
     gh.lazySingleton<_i546.PrescriptionRepo>(
         () => _i636.PrescriptionRepoImpl());

@@ -166,6 +166,7 @@ class _TodayAppointmentState extends State<TodayAppointment>
                   SizedBox(
                     height: 3.h,
                   ),
+                  /*
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -185,7 +186,10 @@ class _TodayAppointmentState extends State<TodayAppointment>
                       ),
                     ],
                   ),
-                  Gap(2.h),
+                  */
+
+                  // Gap(2.h),
+                  /*
                   Consumer<AppointmentProvider>(
                     builder: (context, apptProvide, child) {
                       return StatusHandler(
@@ -214,6 +218,7 @@ class _TodayAppointmentState extends State<TodayAppointment>
                       );
                     },
                   ),
+                  */
                   SizedBox(
                     height: 1.h,
                   ),

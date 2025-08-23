@@ -34,7 +34,10 @@ Future<void> localInjection() async {
     Helpers.prefs = pref;
     CacheUtils.setPrefs(pref);
   });
-  final dio = Dio(BaseOptions(baseUrl: EndPoints.apiBaseUrl, sendTimeout: const Duration(seconds:10),receiveTimeout:  const Duration(seconds:10)));
+  final dio = Dio(BaseOptions(
+      baseUrl: EndPoints.apiBaseUrl,
+      sendTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10)));
   dio.interceptors.add(PrettyDioLogger(
       requestHeader: true, requestBody: true, responseHeader: true));
   final token = Helpers.getString(key: "token");

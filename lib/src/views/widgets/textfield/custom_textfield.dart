@@ -50,7 +50,8 @@ class CustomTextfield extends StatefulWidget {
       this.type,
       this.prefIcon,
       this.onFieldTap,
-      this.suffixWidget});
+      this.suffixWidget,
+      this.textCapitalization = TextCapitalization.none});
 
   final String? formControlName;
   final String? labelText;
@@ -89,6 +90,7 @@ class CustomTextfield extends StatefulWidget {
   final IconData? prefIcon;
   final Function(FormControl<dynamic>)? onFieldTap;
   final Widget? suffixWidget;
+  final TextCapitalization textCapitalization;
 
   @override
   State<CustomTextfield> createState() => _CustomTextfieldState();
@@ -111,6 +113,7 @@ class _CustomTextfieldState extends State<CustomTextfield> {
       inputFormatters: widget.inputFormatters,
       onEditingComplete: widget.onEditingComplete,
       onTap: widget.onFieldTap,
+      textCapitalization: widget.textCapitalization,
       decoration: InputDecoration(
         enabled: widget.enabled,
         errorStyle: Theme.of(context)

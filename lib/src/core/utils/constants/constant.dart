@@ -6,7 +6,7 @@ import 'package:Medikalam/src/views/screens/dashboard/today_appt/today_appointme
 
 ///Constants For Applications
 class Constants {
-  static const qrPrescription ='assets/prescriptions/qr_prescription.png';
+  static const qrPrescription = 'assets/prescriptions/qr_prescription.png';
   static const icons = [
     'assets/icons/today.svg',
     'assets/icons/app.svg',

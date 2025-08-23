@@ -41,8 +41,8 @@ class _BookAppointmentState extends State<BookAppointment> {
                   calendar(
                     context,
                     focusedDay: provider.form.control("appt_date").value,
-                    selectedDayPredicate: (date) =>
-                        isSameDay(provider.form.control("appt_date").value, date),
+                    selectedDayPredicate: (date) => isSameDay(
+                        provider.form.control("appt_date").value, date),
                     onDaySelected: (selectedDay, focusedDay) {
                       provider.updateDate(selectedDay);
                     },

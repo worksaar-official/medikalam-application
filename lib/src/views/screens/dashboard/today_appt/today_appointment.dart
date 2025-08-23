@@ -104,6 +104,7 @@ class _TodayAppointmentState extends State<TodayAppointment>
                         icon: 'assets/icons/register_visit.svg',
                         title: 'Register Visit',
                       ),
+                      /*
                       Gap(2.w),
                       actionCard(
                         theme: context.textTheme,
@@ -116,6 +117,7 @@ class _TodayAppointmentState extends State<TodayAppointment>
                         icon: 'assets/icons/book_appo.svg',
                         title: 'Book Appointment',
                       ),
+                      */
                       Gap(2.w),
                       actionCard(
                         theme: context.textTheme,
@@ -140,8 +142,8 @@ class _TodayAppointmentState extends State<TodayAppointment>
                     child: GestureDetector(
                       onTap: () {
                         // if (context.read<PenProvider>().connectedPen != null) {
-                          context.read<PrescriptionProvider>().isScan = false;
-                          context.push(AppScreens.prescriptionPaper.path);
+                        context.read<PrescriptionProvider>().isScan = false;
+                        context.push(AppScreens.prescriptionPaper.path);
                         // } else {
                         //   showError("Please Connect to a Pen");
                         // }
@@ -418,7 +420,8 @@ final List<AppointmentResponse> dummyAppointments = [
     id: '2',
     patientId: 'P1002',
     name: 'John Smith',
-    apptDate: DateTime.now().subtract(const Duration(days: 45)), // ~1.5 months ago
+    apptDate:
+        DateTime.now().subtract(const Duration(days: 45)), // ~1.5 months ago
     apptTime: '2:30 PM',
     editorId: 'E2002',
     createdAt: DateTime.now().subtract(const Duration(days: 50)),
@@ -427,7 +430,8 @@ final List<AppointmentResponse> dummyAppointments = [
     id: '3',
     patientId: 'P1003',
     name: 'Bob Williams',
-    apptDate: DateTime.now().subtract(const Duration(days: 75)), // ~2.5 months ago
+    apptDate:
+        DateTime.now().subtract(const Duration(days: 75)), // ~2.5 months ago
     apptTime: '11:15 AM',
     editorId: 'E2003',
     createdAt: DateTime.now().subtract(const Duration(days: 90)),
@@ -438,7 +442,8 @@ final List<AppointmentResponse> dummyAppointments = [
     id: '4',
     patientId: 'P1004',
     name: 'Emma Davis',
-    apptDate: DateTime.now().subtract(const Duration(days: 120)), // ~4 months ago
+    apptDate:
+        DateTime.now().subtract(const Duration(days: 120)), // ~4 months ago
     apptTime: '3:00 PM',
     editorId: 'E2004',
     createdAt: DateTime.now().subtract(const Duration(days: 130)),
@@ -447,7 +452,8 @@ final List<AppointmentResponse> dummyAppointments = [
     id: '5',
     patientId: 'P1005',
     name: 'Liam Brown',
-    apptDate: DateTime.now().subtract(const Duration(days: 150)), // ~5 months ago
+    apptDate:
+        DateTime.now().subtract(const Duration(days: 150)), // ~5 months ago
     apptTime: '9:45 AM',
     editorId: 'E2005',
     createdAt: DateTime.now().subtract(const Duration(days: 160)),
@@ -456,7 +462,8 @@ final List<AppointmentResponse> dummyAppointments = [
     id: '6',
     patientId: 'P1006',
     name: 'Sophia Martinez',
-    apptDate: DateTime.now().subtract(const Duration(days: 180)), // ~6 months ago
+    apptDate:
+        DateTime.now().subtract(const Duration(days: 180)), // ~6 months ago
     apptTime: '1:00 PM',
     editorId: 'E2006',
     createdAt: DateTime.now().subtract(const Duration(days: 190)),
@@ -467,7 +474,8 @@ final List<AppointmentResponse> dummyAppointments = [
     id: '7',
     patientId: 'P1007',
     name: 'James Taylor',
-    apptDate: DateTime.now().subtract(const Duration(days: 210)), // ~7 months ago
+    apptDate:
+        DateTime.now().subtract(const Duration(days: 210)), // ~7 months ago
     apptTime: '4:30 PM',
     editorId: 'E2007',
     createdAt: DateTime.now().subtract(const Duration(days: 220)),
@@ -476,7 +484,8 @@ final List<AppointmentResponse> dummyAppointments = [
     id: '8',
     patientId: 'P1008',
     name: 'Olivia White',
-    apptDate: DateTime.now().subtract(const Duration(days: 270)), // ~9 months ago
+    apptDate:
+        DateTime.now().subtract(const Duration(days: 270)), // ~9 months ago
     apptTime: '10:15 AM',
     editorId: 'E2008',
     createdAt: DateTime.now().subtract(const Duration(days: 280)),
@@ -485,7 +494,8 @@ final List<AppointmentResponse> dummyAppointments = [
     id: '9',
     patientId: 'P1009',
     name: 'Charlotte Green',
-    apptDate: DateTime.now().subtract(const Duration(days: 360)), // ~12 months ago
+    apptDate:
+        DateTime.now().subtract(const Duration(days: 360)), // ~12 months ago
     apptTime: '8:45 AM',
     editorId: 'E2009',
     createdAt: DateTime.now().subtract(const Duration(days: 370)),

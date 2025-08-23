@@ -90,9 +90,8 @@ class _PatientLandingPageState extends State<PatientLandingPage>
                               .read<PrescriptionProvider>()
                               .addMobileNumber(
                                   entity.mobileNumber.toString(), entity.id);
-                          context.pushReplacement(
-                              AppScreens.prescriptionPaper.path);
-                          logger.d("Mobile Number : ${entity.mobileNumber}");
+                          context.push(AppScreens.prescriptionPaper.path);
+                          // logger.d("Mobile Number : ${entity.mobileNumber}");
                         }
                       : null,
                   onTap: () async {
@@ -108,7 +107,7 @@ class _PatientLandingPageState extends State<PatientLandingPage>
                             mobileNumber: entity.mobileNumber.toString());
                         if (context.mounted) {
                           context.pop();
-                          logger.d("Patient linked: ${entity.fullName}");
+                          // logger.d("Patient linked: ${entity.fullName}");
                         }
                         EasyLoading.dismiss();
                         break;

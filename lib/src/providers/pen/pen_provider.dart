@@ -81,6 +81,8 @@ class PenProvider extends ChangeNotifier {
     setShowSvg(false);
     showSuccess("Pen Disconnected");
     notifyListeners();
+    // Try to reconnect
+    reconnect();
   }
 
   void clearList() {
@@ -101,5 +103,15 @@ class PenProvider extends ChangeNotifier {
     await DPenCtrl.disconnect();
     penDisconnected();
     _penEventStreamController.add(null);
+  }
+
+  Future<void> reconnect() async {
+    final lastPenMac = Helpers.getString(key: Keys.connectedPenMac);
+    if (lastPenMac != null && lastPenMac.isNotEmpty) {
+      // Wait for a few seconds before trying to reconnect
+      await Future.delayed(const Duration(seconds: 5));
+      showSuccess("Trying to reconnect to the pen...");
+      await connect(lastPenMac);
+    }
   }
 }

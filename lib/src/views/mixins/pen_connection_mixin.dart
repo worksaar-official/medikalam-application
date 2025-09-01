@@ -79,13 +79,10 @@ mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
   }
 
   void _handleEvent(Map<String, dynamic> object) {
-    logger.i("Pen Event Received: $object");
     if (object.containsKey("STRING_PEN_MAC_ADDRESS")) {
       _penProvider.addPenEvent(PenEvent.fromJson(object));
     } else if (object.containsKey("disconnected")) {
       _penProvider.penDisconnected();
-    } else if (object.containsKey("connected")) {
-      // Pen is connected, you can handle this event if needed
     } else if (object.containsKey("page")) {
       _prescriptionProvider.getSymbolName(double.parse(object['x'].toString()),
           double.parse(object['y'].toString()));

@@ -14,7 +14,7 @@
 		</data>
 		<key>Headers/AFPenCommManager.h</key>
 		<data>
-		j4SNPpWikICq/d5PI7I9Jyt0duU=
+		s8sVu20l9aR3zAl1CASKkOfZQaA=
 		</data>
 		<key>Headers/AFPenCommManagerUpdaterDelegate.h</key>
 		<data>
@@ -26,7 +26,7 @@
 		</data>
 		<key>Headers/AFStrokeBuilder.h</key>
 		<data>
-		7UBHyzhVDaGPLh7AApbicavFEGY=
+		S2Uzz4ZUwxFP7Gs6s8LVsjhmKB8=
 		</data>
 		<key>Headers/AFStrokeOptions.h</key>
 		<data>
@@ -38,7 +38,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		VhmGq6Y1vGQzF/pbcV0hmSaLO1s=
+		71U5BQvUYBg5O/3nBnWlYN2U+Sk=
 		</data>
 		<key>License.txt</key>
 		<data>
@@ -77,11 +77,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			j4SNPpWikICq/d5PI7I9Jyt0duU=
+			s8sVu20l9aR3zAl1CASKkOfZQaA=
 			</data>
 			<key>hash2</key>
 			<data>
-			P2B3XfhP3RdqE+m3w6+zIdZaTcCicJH+cu3mOZxcGjo=
+			4Fza5y1UOOg09p26mgxs92dcKwZIetFogHcduZkyT3s=
 			</data>
 		</dict>
 		<key>Headers/AFPenCommManagerUpdaterDelegate.h</key>
@@ -110,11 +110,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			7UBHyzhVDaGPLh7AApbicavFEGY=
+			S2Uzz4ZUwxFP7Gs6s8LVsjhmKB8=
 			</data>
 			<key>hash2</key>
 			<data>
-			MjDXq8NEU4qv+g7NAGIGejClfWcDb0jMV+8gY8T0xxc=
+			e5Okrw2Lfj0zllU1DsTXBwCxMvAzePmanLGb5uiiDhM=
 			</data>
 		</dict>
 		<key>Headers/AFStrokeOptions.h</key>

@@ -45,9 +45,7 @@ mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
     // This listener must be active to update pen list
     DPenCtrl.eventChannel.receiveBroadcastStream().listen((event) {
       final obj = json.decode(event);
-      if (obj.containsKey("STRING_PEN_MAC_ADDRESS")) {
-        _penProvider.addPenEvent(PenEvent.fromJson(obj));
-      }
+      _handleEvent(obj);
     });
   }
 
@@ -80,7 +78,14 @@ mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
 
   void _handleEvent(Map<String, dynamic> object) {
     if (object.containsKey("STRING_PEN_MAC_ADDRESS")) {
-      _penProvider.addPenEvent(PenEvent.fromJson(object));
+      final penEvent = PenEvent.fromJson(object);
+      // NOTE: penMsgType values are based on native SDK constants
+      // 0: PEN_UP, 1: PEN_DOWN, 2: PEN_MOVE, 3: PEN_DISCONNECTED, 4: PEN_CONNECTION_FAILURE, 5: PEN_POWER_OFF
+      if (penEvent.penMsgType == 3 || penEvent.penMsgType == 4) {
+        _penProvider.penDisconnected();
+      } else {
+        _penProvider.addPenEvent(penEvent);
+      }
     } else if (object.containsKey("disconnected")) {
       _penProvider.penDisconnected();
     } else if (object.containsKey("page")) {

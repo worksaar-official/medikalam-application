@@ -5,6 +5,7 @@ import 'dart:async';
 
 // Flutter imports:
 
+
 import 'package:flutter/material.dart';
 
 // Package imports:
@@ -20,19 +21,9 @@ import 'package:Medikalam/src/models/pen/connected_pen.dart';
 
 @injectable
 class PenProvider extends ChangeNotifier {
-  void _parseCapStatus(String? message) {
-    if (message?.contains('cap on') == true) {
-      _handleCapStatus(true);
-    } else if (message?.contains('cap off') == true) {
-      _handleCapStatus(false);
-    }
-  }
-
   final List<PenEvent> _penList = [];
   bool _showSvg = false;
   ConnectedPen? _connectedPen;
-  Timer? _scanTimer;
-  StreamSubscription? _capStatusSubscription;
 
   ConnectedPen? get connectedPen => _connectedPen;
 
@@ -49,25 +40,7 @@ class PenProvider extends ChangeNotifier {
   @override
   void dispose() {
     _penEventStreamController.close();
-    _scanTimer?.cancel();
-    _capStatusSubscription?.cancel();
     super.dispose();
-  }
-
-  void _startScanning() {
-    _scanTimer?.cancel();
-    _scanTimer = Timer.periodic(const Duration(seconds: 5), (_) async {
-      await DPenCtrl.btStartForPeripheralsList();
-    });
-    DPenCtrl.btStartForPeripheralsList();
-  }
-
-  void _handleCapStatus(bool capOn) {
-    if (capOn && _connectedPen != null) {
-      disconnectPen();
-    } else if (!capOn) {
-      _startScanning();
-    }
   }
 
   void setShowSvg(bool value) {
@@ -116,19 +89,10 @@ class PenProvider extends ChangeNotifier {
   }
 
   Future<void> connect(String macAddress) async {
-    _scanTimer?.cancel();
     setConnectedPen(PenEvent(
         macAddress: macAddress, deviceName: '', rssi: 0, penMsgType: 0));
     _penEventStreamController.add(macAddress);
     showSuccess("Connected to Pen $macAddress");
-
-    _capStatusSubscription = DPenCtrl.eventChannel
-        .receiveBroadcastStream()
-        .listen((event) => this._parseCapStatus(event as String?));
-
-    DPenCtrl.setListener();
-    DPenCtrl.setContext();
-
     await DPenCtrl.connect(macAddress);
     Helpers.setString(key: Keys.connectedPenMac, value: macAddress);
   }
@@ -137,6 +101,5 @@ class PenProvider extends ChangeNotifier {
     await DPenCtrl.disconnect();
     penDisconnected();
     _penEventStreamController.add(null);
-    _startScanning();
   }
 }

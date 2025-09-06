@@ -14,7 +14,6 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 // Project imports:
 import 'package:Medikalam/services/routing/utils/extensions/screen_name_extension.dart';
 import 'package:Medikalam/src/core/utils/constants/colors.dart';
-import 'package:Medikalam/src/core/utils/constants/enums.dart';
 import 'package:Medikalam/src/core/utils/constants/extensions.dart';
 import 'package:Medikalam/src/models/appointment/appointment_model.dart';
 import 'package:Medikalam/src/providers/appointment/appointment_provider.dart';
@@ -25,7 +24,6 @@ import 'package:Medikalam/src/views/mixins/pen_connection_mixin.dart';
 import 'package:Medikalam/src/views/widgets/custom_container/custom_container_widget.dart';
 import 'package:Medikalam/src/views/widgets/search_field.dart';
 import 'package:Medikalam/src/views/widgets/wrapper/shimmer_handler.dart';
-import 'package:Medikalam/src/views/widgets/wrapper/status_handler.dart';
 
 class TodayAppointment extends StatefulWidget {
   const TodayAppointment({super.key});
@@ -222,58 +220,8 @@ class _TodayAppointmentState extends State<TodayAppointment>
                   SizedBox(
                     height: 1.h,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        ' Appointment (statistic)',
-                        style: context.textTheme.bodyMedium!.copyWith(
-                          color: AppColors.blackColor,
-                          fontSize: 15,
-                        ),
-                      ),
-                      DropdownButton<String>(
-                        iconEnabledColor: AppColors.btnPrimary,
-                        value: context.watch<DashboardProvider>().selectedValue,
-                        underline: Container(),
-                        style: context.textTheme.bodyMedium!
-                            .copyWith(color: AppColors.txtPrimary),
-                        items: context
-                            .read<DashboardProvider>()
-                            .options
-                            .map((String option) {
-                          return DropdownMenuItem<String>(
-                            value: option,
-                            child: Text(
-                              option,
-                              style: context.textTheme.bodyMedium!.copyWith(
-                                color: AppColors.txtPrimary,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (newValue) {
-                          if (newValue != null) {
-                            context
-                                .read<DashboardProvider>()
-                                .updateSelectedValue(newValue);
-                          }
-                        },
-                      )
-                    ],
-                  ),
-                  Gap(
-                    1.h,
-                  ),
-                  Consumer<AppointmentProvider>(
-                    builder: (context, provider, child) {
-                      final dashBoard = context.read<DashboardProvider>();
-                      dashBoard.updateAppointments(dummyAppointments);
-                      return const AppointmentStatistics();
-                    },
-                  )
+                  // Hiding Appointment (statistic) section on home screen
+                  const SizedBox.shrink(),
                 ],
               ),
             ),

@@ -2,8 +2,6 @@
 
 // Flutter imports:
 
-
-
 import 'package:flutter/material.dart';
 
 // Package imports:
@@ -175,24 +173,30 @@ class _DashboardScreenState extends State<DashboardScreen>
                   context.textTheme.titleSmall?.copyWith(inherit: true),
               selectedItemColor: AppColors.navText,
               unselectedItemColor: AppColors.white,
-              currentIndex: provider.navIndex,
-              onTap: provider.updateIndex,
-              items: List.generate(
-                4,
-                (index) => BottomNavigationBarItem(
-                  backgroundColor: AppColors.white,
-                  icon: SvgPicture.asset(
-                    Constants.icons[index],
-                    colorFilter: ColorFilter.mode(
-                      provider.navIndex == index
-                          ? Colors.blue
-                          : AppColors.txtLabel,
-                      BlendMode.srcIn,
+              // Hide the Appointment tab (index 1) by showing only indices [0, 2, 3]
+              // Map visible indices -> actual page indices
+              currentIndex: [0, 2, 3].indexOf(provider.navIndex).clamp(0, 2),
+              onTap: (visibleIndex) {
+                final mapped = [0, 2, 3][visibleIndex];
+                provider.updateIndex(mapped);
+              },
+              items: [0, 2, 3]
+                  .map(
+                    (actualIndex) => BottomNavigationBarItem(
+                      backgroundColor: AppColors.white,
+                      icon: SvgPicture.asset(
+                        Constants.icons[actualIndex],
+                        colorFilter: ColorFilter.mode(
+                          provider.navIndex == actualIndex
+                              ? Colors.blue
+                              : AppColors.txtLabel,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                      label: Constants.iconText[actualIndex],
                     ),
-                  ),
-                  label: Constants.iconText[index],
-                ),
-              ),
+                  )
+                  .toList(),
             ),
           ));
     });

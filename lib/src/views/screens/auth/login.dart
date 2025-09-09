@@ -39,76 +39,75 @@ class _LoginPageState extends State<LoginPage> {
           return ReactiveForm(
             formGroup: provider.loginForm,
             child: SafeArea(
-              child: Center(
-                child: Padding(
-                  padding:
-                      EdgeInsets.symmetric(vertical: 2.5.h, horizontal: 6.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Let's sign you in.",
-                          style: context.textTheme.titleLarge),
-                      SizedBox(height: 4.h),
-                      const HelperContainer(
-                        title: 'Email',
-                        widget: CustomTextfield(
-                          hintText: 'Enter your email',
-                          formControlName: 'email',
-                        ),
+              child: SingleChildScrollView(
+                padding: EdgeInsets.symmetric(vertical: 2.5.h, horizontal: 6.w),
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Let's sign you in.",
+                        style: context.textTheme.titleLarge),
+                    SizedBox(height: 4.h),
+                    const HelperContainer(
+                      title: 'Email',
+                      widget: CustomTextfield(
+                        hintText: 'Enter your email',
+                        formControlName: 'email',
                       ),
-                      SizedBox(width: 4.w),
-                      HelperContainer(
-                        title: 'Password',
-                        widget: CustomTextfield(
-                          type: 'password',
-                          hintText: 'Enter your password',
-                          formControlName: 'password',
-                          isPassword: true,
-                          textInputAction: TextInputAction.done,
-                          onEditingComplete: (form) {
-                            handleLogin(context, provider);
-                          },
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          context.push(AppScreens.resetPassword.path);
+                    ),
+                    SizedBox(height: 2.h),
+                    HelperContainer(
+                      title: 'Password',
+                      widget: CustomTextfield(
+                        type: 'password',
+                        hintText: 'Enter your password',
+                        formControlName: 'password',
+                        isPassword: true,
+                        textInputAction: TextInputAction.done,
+                        onEditingComplete: (form) {
+                          handleLogin(context, provider);
                         },
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: Text(
-                            'Reset Password',
-                            style: context.textTheme.bodyLarge!.copyWith(
-                              color: AppColors.txtPrimary,
-                              fontWeight: FontWeight.w600,
-                            ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        context.push(AppScreens.resetPassword.path);
+                      },
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          'Reset Password',
+                          style: context.textTheme.bodyLarge!.copyWith(
+                            color: AppColors.txtPrimary,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
-                      if (kDebugMode)
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {
-                              final form = provider.loginForm;
-                              form
-                                  .control('email')
-                                  .updateValue('example@gmail.com');
-                              form.control('password').updateValue('ashray123');
-                            },
-                            child: const Text('Autofill (temp)'),
-                          ),
+                    ),
+                    if (kDebugMode)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () {
+                            final form = provider.loginForm;
+                            form
+                                .control('email')
+                                .updateValue('example@gmail.com');
+                            form.control('password').updateValue('ashray123');
+                          },
+                          child: const Text('Autofill (temp)'),
                         ),
-                      const Spacer(),
-                      CustomButtonNew(
-                          status: provider.getSubmissionStatus,
-                          text: 'Log In',
-                          onTap: () {
-                            handleLogin(context, provider);
-                          }),
-                      Gap(2.h),
-                    ],
-                  ),
+                      ),
+                    SizedBox(height: 4.h),
+                    CustomButtonNew(
+                        status: provider.getSubmissionStatus,
+                        text: 'Log In',
+                        onTap: () {
+                          handleLogin(context, provider);
+                        }),
+                    Gap(2.h),
+                  ],
                 ),
               ),
             ),

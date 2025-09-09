@@ -2,6 +2,7 @@
 
 // Flutter imports:
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // Package imports:
 import 'package:gap/gap.dart';
@@ -15,7 +16,6 @@ import 'package:Medikalam/src/core/utils/constants/extensions.dart';
 import 'package:Medikalam/src/core/utils/helpers/logger.dart';
 import 'package:Medikalam/src/providers/patient/patient_provider.dart';
 import 'package:Medikalam/src/views/widgets/buttons/custom_button.dart';
-import 'package:Medikalam/src/views/widgets/buttons/radio_buttons.dart';
 import 'package:Medikalam/src/views/widgets/calendar/custom_calendar.dart';
 import 'package:Medikalam/src/views/widgets/label_widget.dart';
 import 'package:Medikalam/src/views/widgets/textfield/custom_textfield.dart';
@@ -85,12 +85,23 @@ Future<void> newPatientBottomSheet(BuildContext context) async {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const HelperContainer(
+                            HelperContainer(
                               title: 'Mobile Number',
                               widget: CustomTextfield(
                                 hintText: 'Enter mobile number',
                                 formControlName: 'mobileNumber',
-                                keyboardType: TextInputType.number,
+                                keyboardType: TextInputType.phone,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                  LengthLimitingTextInputFormatter(10),
+                                ],
+                                prefixWidget: const Text('+91 '),
+                                validationMessages: {
+                                  'minLength': (error) =>
+                                      'Mobile number must be 10 digits',
+                                  'maxLength': (error) =>
+                                      'Mobile number must be 10 digits',
+                                },
                               ),
                             ),
                             Gap(2.h),
@@ -142,40 +153,152 @@ Future<void> newPatientBottomSheet(BuildContext context) async {
                               style: ctx.textTheme.bodyLarge
                                   ?.copyWith(color: AppColors.txtLabel),
                             ),
-                            Gap(1.h),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: CustomRadioButton(
-                                    selectedValue:
-                                        provider.form.control('gender').value ??
-                                            '',
-                                    label: 'Male',
-                                    onChanged: (v) {
-                                      provider.updateGender(v);
-                                      provider.form
-                                          .control('gender')
-                                          .markAsTouched();
-                                    },
-                                    value: 'M',
+                            SizedBox(height: 0.8.h),
+                            Container(
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        provider.updateGender('M');
+                                        provider.form
+                                            .control('gender')
+                                            .markAsTouched();
+                                      },
+                                      child: Container(
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: provider.form
+                                                      .control('gender')
+                                                      .value ==
+                                                  'M'
+                                              ? const Color(0xFF3B82F6)
+                                              : Colors.transparent,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          boxShadow: provider.form
+                                                      .control('gender')
+                                                      .value ==
+                                                  'M'
+                                              ? [
+                                                  BoxShadow(
+                                                    color:
+                                                        const Color(0xFF3B82F6)
+                                                            .withOpacity(0.3),
+                                                    blurRadius: 8,
+                                                    offset: const Offset(0, 2),
+                                                  ),
+                                                ]
+                                              : null,
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.male,
+                                              size: 16,
+                                              color: provider.form
+                                                          .control('gender')
+                                                          .value ==
+                                                      'M'
+                                                  ? Colors.white
+                                                  : Colors.grey[600],
+                                            ),
+                                            SizedBox(width: 1.w),
+                                            Text(
+                                              'Male',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12,
+                                                color: provider.form
+                                                            .control('gender')
+                                                            .value ==
+                                                        'M'
+                                                    ? Colors.white
+                                                    : Colors.grey[600],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                Expanded(
-                                  child: CustomRadioButton(
-                                    selectedValue:
-                                        provider.form.control('gender').value ??
-                                            '',
-                                    label: 'Female',
-                                    onChanged: (v) {
-                                      provider.updateGender(v);
-                                      provider.form
-                                          .control('gender')
-                                          .markAsTouched();
-                                    },
-                                    value: 'F',
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        provider.updateGender('F');
+                                        provider.form
+                                            .control('gender')
+                                            .markAsTouched();
+                                      },
+                                      child: Container(
+                                        height: 40,
+                                        decoration: BoxDecoration(
+                                          color: provider.form
+                                                      .control('gender')
+                                                      .value ==
+                                                  'F'
+                                              ? const Color(0xFFEC4899)
+                                              : Colors.transparent,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          boxShadow: provider.form
+                                                      .control('gender')
+                                                      .value ==
+                                                  'F'
+                                              ? [
+                                                  BoxShadow(
+                                                    color:
+                                                        const Color(0xFFEC4899)
+                                                            .withOpacity(0.3),
+                                                    blurRadius: 8,
+                                                    offset: const Offset(0, 2),
+                                                  ),
+                                                ]
+                                              : null,
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.female,
+                                              size: 16,
+                                              color: provider.form
+                                                          .control('gender')
+                                                          .value ==
+                                                      'F'
+                                                  ? Colors.white
+                                                  : Colors.grey[600],
+                                            ),
+                                            SizedBox(width: 1.w),
+                                            Text(
+                                              'Female',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 12,
+                                                color: provider.form
+                                                            .control('gender')
+                                                            .value ==
+                                                        'F'
+                                                    ? Colors.white
+                                                    : Colors.grey[600],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                             if (provider.form.control('gender').invalid &&
                                 provider.form.control('gender').touched) ...[

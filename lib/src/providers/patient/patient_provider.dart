@@ -226,11 +226,17 @@ class PatientProvider extends CentralizedProvider<PatientResponse> {
               entity.mobileNumber.toString(),
               entity.id,
             );
-
-        Navigator.of(context).popUntil(
-            (route) => route.isFirst || !route.willHandlePopInternally);
-
-        context.pushReplacement(AppScreens.prescriptionPaper.path);
+        await context
+            .read<PrescriptionProvider>()
+            .linkPage(mobileNumber: entity.mobileNumber.toString());
+        // After linking, simply go back to the previous screens
+        // Close bottom sheet (if open) and then the selection screen
+        if (Navigator.canPop(context)) {
+          context.pop();
+        }
+        if (Navigator.canPop(context)) {
+          context.pop();
+        }
       } else {
         context.pop();
         context.pushNamed(AppScreens.patientDetail.name, extra: entity);

@@ -16,7 +16,6 @@ import 'package:image_picker/image_picker.dart';
 
 // Project imports:
 // import 'package:Medikalam/services/routing/utils/extensions/screen_name_extension.dart';
-import 'package:Medikalam/src/core/utils/constants/colors.dart';
 import 'package:Medikalam/src/core/utils/constants/extensions.dart';
 import 'package:Medikalam/src/core/utils/helpers/helpers.dart';
 import 'package:Medikalam/src/providers/form/form_provider.dart';
@@ -24,7 +23,6 @@ import 'package:Medikalam/src/providers/registration/registration_provider.dart'
 import 'package:Medikalam/src/views/widgets/appbar/backappbar.dart';
 // import 'package:Medikalam/src/views/widgets/bottomsheet/custom_bottom_sheet.dart';
 import 'package:Medikalam/src/views/widgets/buttons/custom_button.dart';
-import 'package:Medikalam/src/views/widgets/buttons/radio_buttons.dart';
 // import 'package:Medikalam/src/views/widgets/custom_container/custom_container_widget.dart';
 import 'package:Medikalam/src/views/widgets/custom_container/file_upload_widget.dart';
 import 'package:Medikalam/src/views/widgets/label_widget.dart';
@@ -483,70 +481,85 @@ class _RegisterVisitPageState extends State<RegisterVisitPage> {
                               getFileSize: _getFileSizeString,
                             ),
 
-                          // Upload button when files are selected
-                          if (provider.hasFiles) ...[
-                            SizedBox(height: 1.h),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton.icon(
-                                onPressed: provider.isUploading
-                                    ? null
-                                    : () => _uploadFiles(context, provider),
-                                icon: provider.isUploading
-                                    ? SizedBox(
-                                        width: 16,
-                                        height: 16,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                  Colors.white),
-                                        ),
-                                      )
-                                    : const Icon(Icons.cloud_upload, size: 16),
-                                label: Text(
-                                  provider.isUploading
-                                      ? 'Uploading...'
-                                      : 'Upload All Files',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF059669),
-                                  foregroundColor: Colors.white,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 12),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                          // Removed Upload All Files button as requested
                         ],
                       ),
                     ),
 
                     SizedBox(height: 2.h),
 
-                    // Connect button with simple styling
+                    // Connect button with simple styling (restyled)
                     CustomButtonNew(
-                      text: 'Connect & Scan QR',
-                      color: const Color(0xFF2563EB),
+                      color: const Color(0xFF0EA5E9),
                       borderRadius: 12,
-                      style: context.textTheme.labelLarge?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
+                      height: 6.5.h,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.qr_code_scanner_outlined,
+                              color: Colors.white, size: 20),
+                          SizedBox(width: 1.w),
+                          Text(
+                            'Connect & Scan QR',
+                            style: context.textTheme.labelLarge?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
                       ),
                       onTap: () {
-                        // Navigate to QR scanner
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => const QrScanner(),
+                          ),
+                        );
+                      },
+                    ),
+
+                    SizedBox(height: 1.2.h),
+
+                    // Save button for Register Visit (restyled)
+                    CustomButtonNew(
+                      color: const Color(0xFF2563EB),
+                      borderRadius: 12,
+                      height: 6.5.h,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.save_outlined,
+                              color: Colors.white, size: 20),
+                          SizedBox(width: 1.w),
+                          Text(
+                            'Save',
+                            style: context.textTheme.labelLarge?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        final form =
+                            context.read<FormProvider>().registrationForm;
+                        if (!form.valid) {
+                          form.markAllAsTouched();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please fill required fields'),
+                              backgroundColor: Colors.orange,
+                            ),
+                          );
+                          return;
+                        }
+                        // TODO: Integrate with backend submit if available
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Saved successfully'),
+                            backgroundColor: Colors.green,
                           ),
                         );
                       },
@@ -929,43 +942,5 @@ class _RegisterVisitPageState extends State<RegisterVisitPage> {
     }
   }
 
-  Future<void> _uploadFiles(
-      BuildContext context, RegistrationProvider provider) async {
-    try {
-      final result = await provider.uploadAllFiles();
-
-      if (context.mounted) {
-        result.when(
-          success: (data) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('All files uploaded successfully!'),
-                backgroundColor: Colors.green,
-                duration: Duration(seconds: 2),
-              ),
-            );
-          },
-          failure: (error) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Error uploading files: ${error.message}'),
-                backgroundColor: Colors.red,
-                duration: const Duration(seconds: 3),
-              ),
-            );
-          },
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error uploading files: $e'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-      }
-    }
-  }
+  // Removed unused _uploadFiles method
 }

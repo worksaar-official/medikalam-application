@@ -195,9 +195,9 @@ class Helpers {
       if (e.error == 'Http status error [401]') {
         debugPrint("I go here 3 ${e.error == "Http status error [401]"}");
       } else {
-        logger.e(e.error);
+        logger.e(e.error ?? 'Unknown Dio error occurred');
         throw ServerException(
-            code: e.response?.statusCode, message: e.error.toString());
+            code: e.response?.statusCode, message: e.error?.toString() ?? 'An unknown network error occurred. Please check your connection.');
       }
     }
     return null;

@@ -27,6 +27,10 @@ import 'package:Medikalam/src/views/widgets/bottomsheet/connection_bottomsheet.d
 import 'package:Medikalam/src/views/widgets/custom_container/custom_container_widget.dart';
 import 'package:Medikalam/src/views/widgets/wrapper/shimmer_handler.dart';
 import 'package:Medikalam/src/core/utils/helpers/logger.dart';
+import 'package:Medikalam/src/core/utils/helpers/notification_helper.dart';
+
+import '../../../core/utils/helpers/notification_helper.dart'
+    as NotificationHelper;
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -134,9 +138,19 @@ class _DashboardScreenState extends State<DashboardScreen>
                             if (isConnected) {
                               context.read<PrescriptionProvider>().isScan =
                                   false;
-                              context.push(AppScreens.prescriptionPaper.path);
+                              if (provider.connectedPen?.macAddress != null) {
+                                context.push(AppScreens.prescriptionPaper.path);
+                              } else {
+                                NotificationHelper.showError(
+                                    "Pen connection not established");
+                              }
                             } else {
                               await penConnectionBottomSheet(context: context);
+                              // Verify connection after bottom sheet closes
+                              if (!provider.isConnected) {
+                                NotificationHelper.showError(
+                                    "Please connect a pen first");
+                              }
                             }
                           },
                         ),

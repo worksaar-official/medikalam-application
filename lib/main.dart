@@ -21,6 +21,7 @@ import 'package:Medikalam/src/core/theme/theme.dart';
 import 'package:Medikalam/src/core/utils/environment/environment.dart';
 import 'package:Medikalam/src/core/utils/helpers/permission_helper.dart';
 import 'package:Medikalam/src/providers/provider.dart';
+import 'package:Medikalam/src/providers/pen/pen_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +45,10 @@ Future<void> main() async {
 Future<void> _initializeApp() async {
   await localInjection();
   configureDependencies();
+
+  // Reset pen connection state before creating app
+  await getIt<PenProvider>().resetConnectionState();
+
   injectRouter();
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -69,6 +74,10 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       PermissionHandler.requestAllPermissions(context);
+      // Reset pen connection state after build completes
+      Future.delayed(Duration.zero, () {
+        context.read<PenProvider>().resetConnectionState();
+      });
     });
   }
 

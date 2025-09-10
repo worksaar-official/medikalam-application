@@ -5,7 +5,6 @@ import 'dart:async';
 
 // Flutter imports:
 
-
 import 'package:flutter/material.dart';
 
 // Package imports:
@@ -80,6 +79,20 @@ class PenProvider extends ChangeNotifier {
     _connectedPen = null;
     setShowSvg(false);
     showSuccess("Pen Disconnected");
+    notifyListeners();
+  }
+
+  Future<void> resetConnectionState() async {
+    // Force hardware disconnect
+    await DPenCtrl.disconnect().catchError((_) {});
+
+    // Clear all connection state
+    _connectedPen = null;
+    _penList.clear();
+    Helpers.deleteString(key: Keys.connectedPenMac);
+
+    // Notify listeners
+    _penEventStreamController.add(null);
     notifyListeners();
   }
 

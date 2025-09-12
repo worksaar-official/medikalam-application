@@ -56,9 +56,9 @@ Map<String, dynamic> _$$ViewCaseDataImplToJson(_$ViewCaseDataImpl instance) =>
 
 _$PatientImpl _$$PatientImplFromJson(Map<String, dynamic> json) =>
     _$PatientImpl(
-      name: json['name'] as String,
-      mobileNumber: (json['mobileNumber'] as num).toInt(),
-      gender: json['gender'] as String,
+      name: json['name'] as String?,
+      mobileNumber: (json['mobileNumber'] as num?)?.toInt(),
+      gender: json['gender'] as String?,
     );
 
 Map<String, dynamic> _$$PatientImplToJson(_$PatientImpl instance) =>

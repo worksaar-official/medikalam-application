@@ -5,7 +5,7 @@
 //  Created by Chien-chuTsang on 2018/2/8.
 //  Copyright © 2018年 ophaya. All rights reserved.
 //
-
+#ifndef DSKDSA31
 #import <Foundation/Foundation.h>
 //#import "AFNode.h"
 @class AFNode;
@@ -61,6 +61,8 @@ typedef NS_ENUM(NSInteger, PenGripStyle)
 - (void) processNode:(NSArray<AFNode*>*) arrAFNode;
 - (void) onReceiveGripStyle:(PenGripStyle) penGripStyle;
 - (void) rawResponse:(NSData*) data;
+@optional
+- (void) authResult:(NSString*) msg code:(int)code;
 @end
 @protocol AFPenCommManagerProtocol <NSObject>
 - (void) setAFPenCommParserStrokeHandler:(id<AFPenCommParserStrokeHandler>)delegate;
@@ -93,8 +95,8 @@ typedef NS_ENUM(NSInteger, PenGripStyle)
 @interface AFPenCommManager : NSObject
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
-+ (AFPenCommManager *) sharedInstance;
-
+//+ (AFPenCommManager *) sharedInstance;
++ (instancetype) sharedInstance;
 - (void) setAFPenCommParserStrokeHandler:(id<AFPenCommParserStrokeHandler>)delegate;
 - (void) setAFPenCommManagerNewPeripheral:(id<AFPenCommManagerNewPeripheral>)delegate;
 - (void) setAFOfflineDataDelegate:(id<AFOfflineDataDelegate>)delegate;
@@ -142,11 +144,13 @@ typedef NS_ENUM(NSInteger, PenGripStyle)
                            callback: (void (^)(bool ))result;
 -(void)cmdToPen:(NSString*) pktstr;
 -(void) requestSetWorkingModeCalib: (void (^)(uint16_t ))result ;
-- (void) requestCalibrate;
+//- (void) requestCalibrate;
 - (void) requestCalibrate : (void (^)(uint16_t ))result;
 - (void) requestGetCalibratePara : (void (^)(NSData* ))result;
 - (void) requestSetPowerDownTime: (uint16_t) powerdowntime
                   AndStandbyTime: (uint16_t) standbytime
                           result:(void (^)(BOOL b ))result;
+- (void) DataFromPen:(NSData *)data;
 @end
+#endif
 #endif

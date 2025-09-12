@@ -6,7 +6,7 @@
 //  Copyright © 2017年 com.seesall.btpent1. All rights reserved.
 //
 #import <Foundation/Foundation.h>
-
+#if VENDOR==1
 typedef NS_ENUM(NSInteger, PenAction) {
     PenActionNone, PenActionPenDown,PenActionPenUp
 };
@@ -20,6 +20,6 @@ typedef NS_ENUM(NSInteger, PenAction) {
 @property (nonatomic) int book_height;
 @property (nonatomic) int reserved1;
 -(NSData*) toBytes;
-
 @end
+#endif
 

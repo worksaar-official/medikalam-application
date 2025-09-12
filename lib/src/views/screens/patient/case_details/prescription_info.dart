@@ -30,8 +30,8 @@ class _PrescriptionInfoTabState extends State<PrescriptionInfoTab> {
         onSuccess: Column(
           children: [
             _title(
-                name: provider.caseDetails.data!.patient.name,
-                gender: provider.caseDetails.data!.patient.gender,
+                name: provider.caseDetails.data!.patient.name ?? 'N/A',
+                gender: provider.caseDetails.data!.patient.gender ?? 'N/A',
                 age: "23 Years"),
             Expanded(
               child: ListView.builder(

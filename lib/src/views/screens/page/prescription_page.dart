@@ -86,30 +86,32 @@ class PrescriptionCard extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     final path = Path();
-
-    for (int i = 0; i < points.length; i++) {
-      final Point point = points[i];
-      final Offset offset =
-          _getScaledOffset(imageHeight, imageWidth, size, point);
-
-      if (point.actionType == 1) {
-        path.moveTo(offset.dx, offset.dy);
-      } else if (point.actionType == 3) {
-        final prevPoint = points[i - 1];
-        final previousOffset =
-            _getScaledOffset(imageHeight, imageWidth, size, prevPoint);
-        final midPoint = Offset(
-          (previousOffset.dx + offset.dx) / 2,
-          (previousOffset.dy + offset.dy) / 2,
-        );
-        path.quadraticBezierTo(
-          previousOffset.dx,
-          previousOffset.dy,
-          midPoint.dx,
-          midPoint.dy,
-        );
-      }
+    if (points.length < 2) {
+      return; // Not enough points to draw
     }
+
+    // Start at the first point
+    path.moveTo(
+      _getScaledOffset(imageHeight, imageWidth, size, points[0]).dx,
+      _getScaledOffset(imageHeight, imageWidth, size, points[0]).dy,
+    );
+
+    for (int i = 0; i < points.length - 1; i++) {
+      final p1 = _getScaledOffset(imageHeight, imageWidth, size, points[i]);
+      final p2 = _getScaledOffset(imageHeight, imageWidth, size, points[i + 1]);
+
+      // Use the midpoint to create a smooth curve
+      final midPoint = Offset((p1.dx + p2.dx) / 2, (p1.dy + p2.dy) / 2);
+
+      path.quadraticBezierTo(p1.dx, p1.dy, midPoint.dx, midPoint.dy);
+    }
+
+    // Draw the final segment
+    path.lineTo(
+      _getScaledOffset(imageHeight, imageWidth, size, points.last).dx,
+      _getScaledOffset(imageHeight, imageWidth, size, points.last).dy,
+    );
+
     canvas.drawPath(path, paint);
   }
 

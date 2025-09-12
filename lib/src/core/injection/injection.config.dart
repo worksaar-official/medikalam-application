@@ -1,3 +1,4 @@
+// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
@@ -14,6 +15,8 @@ import 'package:Medikalam/services/api/appointment/appointment_repo.dart'
     as _i458;
 import 'package:Medikalam/services/api/appointment/appointment_repo_impl.dart'
     as _i1009;
+import 'package:Medikalam/services/api/attachments/attachment_repo.dart'
+    as _i83;
 import 'package:Medikalam/services/api/auth/auth_repo.dart' as _i137;
 import 'package:Medikalam/services/api/auth/auth_repo_impl.dart' as _i427;
 import 'package:Medikalam/services/api/care_guide/care_guide_repo_impl.dart'
@@ -30,10 +33,6 @@ import 'package:Medikalam/services/api/prescription/prescription_repo.dart'
     as _i546;
 import 'package:Medikalam/services/api/prescription/prescription_repo_impl.dart'
     as _i636;
-import 'package:Medikalam/services/api/attachments/attachment_repo.dart'
-    as _i1051;
-import 'package:Medikalam/services/api/attachments/attachment_repo_impl.dart'
-    as _i1052;
 import 'package:Medikalam/src/core/injection/image_service.dart' as _i1005;
 import 'package:Medikalam/src/providers/appointment/appointment_provider.dart'
     as _i617;
@@ -64,19 +63,16 @@ extension GetItInjectableX on _i174.GetIt {
       environment,
       environmentFilter,
     );
-    gh.factory<_i988.AuthProvider>(() => _i988.AuthProvider());
-    gh.factory<_i583.DashboardProvider>(() => _i583.DashboardProvider());
-    gh.factory<_i803.FormProvider>(() => _i803.FormProvider());
     gh.factory<_i799.CareGuideProvider>(() => _i799.CareGuideProvider());
-    gh.factory<_i66.PenProvider>(() => _i66.PenProvider());
-    gh.factory<_i532.PermissionListenerProvider>(
-        () => _i532.PermissionListenerProvider());
+    gh.factory<_i803.FormProvider>(() => _i803.FormProvider());
+    gh.factory<_i988.AuthProvider>(() => _i988.AuthProvider());
     gh.factory<_i951.AudioProvider>(() => _i951.AudioProvider());
     gh.factory<_i716.PrescriptionProvider>(() => _i716.PrescriptionProvider());
-    gh.factory<_i690.RegistrationProvider>(
-        () => _i690.RegistrationProvider(gh<_i1051.AttachmentRepo>()));
+    gh.factory<_i66.PenProvider>(() => _i66.PenProvider());
+    gh.factory<_i583.DashboardProvider>(() => _i583.DashboardProvider());
+    gh.factory<_i532.PermissionListenerProvider>(
+        () => _i532.PermissionListenerProvider());
     gh.lazySingleton<_i1005.ImageService>(() => _i1005.ImageService());
-    gh.lazySingleton<_i1051.AttachmentRepo>(() => _i1052.AttachmentRepoImpl());
     gh.lazySingleton<_i1022.DashboardRepo>(() => _i70.DashboardRepoImpl());
     gh.lazySingleton<_i546.PrescriptionRepo>(
         () => _i636.PrescriptionRepoImpl());
@@ -87,6 +83,8 @@ extension GetItInjectableX on _i174.GetIt {
         () => _i617.AppointmentProvider(gh<_i458.AppointmentRepo>()));
     gh.lazySingleton<_i137.AuthRepo>(() => _i427.AuthRepoImpl());
     gh.lazySingleton<_i383.CareGuideRepo>(() => _i1050.CareGuideRepoImpl());
+    gh.factory<_i690.RegistrationProvider>(
+        () => _i690.RegistrationProvider(gh<_i83.AttachmentRepo>()));
     gh.factory<_i423.PatientProvider>(
         () => _i423.PatientProvider(gh<_i972.PatientRepo>()));
     return this;

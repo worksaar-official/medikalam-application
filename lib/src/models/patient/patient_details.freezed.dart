@@ -221,6 +221,7 @@ Data _$DataFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Data {
+  PatientInfo get patientDetails => throw _privateConstructorUsedError;
   List<PatientCase> get patientCases => throw _privateConstructorUsedError;
 
   /// Serializes this Data to a JSON map.
@@ -237,7 +238,9 @@ abstract class $DataCopyWith<$Res> {
   factory $DataCopyWith(Data value, $Res Function(Data) then) =
       _$DataCopyWithImpl<$Res, Data>;
   @useResult
-  $Res call({List<PatientCase> patientCases});
+  $Res call({PatientInfo patientDetails, List<PatientCase> patientCases});
+
+  $PatientInfoCopyWith<$Res> get patientDetails;
 }
 
 /// @nodoc
@@ -255,14 +258,29 @@ class _$DataCopyWithImpl<$Res, $Val extends Data>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? patientDetails = null,
     Object? patientCases = null,
   }) {
     return _then(_value.copyWith(
+      patientDetails: null == patientDetails
+          ? _value.patientDetails
+          : patientDetails // ignore: cast_nullable_to_non_nullable
+              as PatientInfo,
       patientCases: null == patientCases
           ? _value.patientCases
           : patientCases // ignore: cast_nullable_to_non_nullable
               as List<PatientCase>,
     ) as $Val);
+  }
+
+  /// Create a copy of Data
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $PatientInfoCopyWith<$Res> get patientDetails {
+    return $PatientInfoCopyWith<$Res>(_value.patientDetails, (value) {
+      return _then(_value.copyWith(patientDetails: value) as $Val);
+    });
   }
 }
 
@@ -273,7 +291,10 @@ abstract class _$$DataImplCopyWith<$Res> implements $DataCopyWith<$Res> {
       __$$DataImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({List<PatientCase> patientCases});
+  $Res call({PatientInfo patientDetails, List<PatientCase> patientCases});
+
+  @override
+  $PatientInfoCopyWith<$Res> get patientDetails;
 }
 
 /// @nodoc
@@ -288,9 +309,14 @@ class __$$DataImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? patientDetails = null,
     Object? patientCases = null,
   }) {
     return _then(_$DataImpl(
+      patientDetails: null == patientDetails
+          ? _value.patientDetails
+          : patientDetails // ignore: cast_nullable_to_non_nullable
+              as PatientInfo,
       patientCases: null == patientCases
           ? _value._patientCases
           : patientCases // ignore: cast_nullable_to_non_nullable
@@ -302,12 +328,16 @@ class __$$DataImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$DataImpl implements _Data {
-  const _$DataImpl({required final List<PatientCase> patientCases})
+  const _$DataImpl(
+      {required this.patientDetails,
+      required final List<PatientCase> patientCases})
       : _patientCases = patientCases;
 
   factory _$DataImpl.fromJson(Map<String, dynamic> json) =>
       _$$DataImplFromJson(json);
 
+  @override
+  final PatientInfo patientDetails;
   final List<PatientCase> _patientCases;
   @override
   List<PatientCase> get patientCases {
@@ -318,7 +348,7 @@ class _$DataImpl implements _Data {
 
   @override
   String toString() {
-    return 'Data(patientCases: $patientCases)';
+    return 'Data(patientDetails: $patientDetails, patientCases: $patientCases)';
   }
 
   @override
@@ -326,14 +356,16 @@ class _$DataImpl implements _Data {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$DataImpl &&
+            (identical(other.patientDetails, patientDetails) ||
+                other.patientDetails == patientDetails) &&
             const DeepCollectionEquality()
                 .equals(other._patientCases, _patientCases));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, const DeepCollectionEquality().hash(_patientCases));
+  int get hashCode => Object.hash(runtimeType, patientDetails,
+      const DeepCollectionEquality().hash(_patientCases));
 
   /// Create a copy of Data
   /// with the given fields replaced by the non-null parameter values.
@@ -352,11 +384,14 @@ class _$DataImpl implements _Data {
 }
 
 abstract class _Data implements Data {
-  const factory _Data({required final List<PatientCase> patientCases}) =
-      _$DataImpl;
+  const factory _Data(
+      {required final PatientInfo patientDetails,
+      required final List<PatientCase> patientCases}) = _$DataImpl;
 
   factory _Data.fromJson(Map<String, dynamic> json) = _$DataImpl.fromJson;
 
+  @override
+  PatientInfo get patientDetails;
   @override
   List<PatientCase> get patientCases;
 
@@ -365,6 +400,245 @@ abstract class _Data implements Data {
   @override
   @JsonKey(includeFromJson: false, includeToJson: false)
   _$$DataImplCopyWith<_$DataImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+PatientInfo _$PatientInfoFromJson(Map<String, dynamic> json) {
+  return _PatientInfo.fromJson(json);
+}
+
+/// @nodoc
+mixin _$PatientInfo {
+  @JsonKey(name: '_id')
+  String get id => throw _privateConstructorUsedError;
+  int get mobileNumber => throw _privateConstructorUsedError;
+  String get fullName => throw _privateConstructorUsedError;
+  String get gender => throw _privateConstructorUsedError;
+  int get age => throw _privateConstructorUsedError;
+
+  /// Serializes this PatientInfo to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of PatientInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $PatientInfoCopyWith<PatientInfo> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $PatientInfoCopyWith<$Res> {
+  factory $PatientInfoCopyWith(
+          PatientInfo value, $Res Function(PatientInfo) then) =
+      _$PatientInfoCopyWithImpl<$Res, PatientInfo>;
+  @useResult
+  $Res call(
+      {@JsonKey(name: '_id') String id,
+      int mobileNumber,
+      String fullName,
+      String gender,
+      int age});
+}
+
+/// @nodoc
+class _$PatientInfoCopyWithImpl<$Res, $Val extends PatientInfo>
+    implements $PatientInfoCopyWith<$Res> {
+  _$PatientInfoCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of PatientInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? mobileNumber = null,
+    Object? fullName = null,
+    Object? gender = null,
+    Object? age = null,
+  }) {
+    return _then(_value.copyWith(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      mobileNumber: null == mobileNumber
+          ? _value.mobileNumber
+          : mobileNumber // ignore: cast_nullable_to_non_nullable
+              as int,
+      fullName: null == fullName
+          ? _value.fullName
+          : fullName // ignore: cast_nullable_to_non_nullable
+              as String,
+      gender: null == gender
+          ? _value.gender
+          : gender // ignore: cast_nullable_to_non_nullable
+              as String,
+      age: null == age
+          ? _value.age
+          : age // ignore: cast_nullable_to_non_nullable
+              as int,
+    ) as $Val);
+  }
+}
+
+/// @nodoc
+abstract class _$$PatientInfoImplCopyWith<$Res>
+    implements $PatientInfoCopyWith<$Res> {
+  factory _$$PatientInfoImplCopyWith(
+          _$PatientInfoImpl value, $Res Function(_$PatientInfoImpl) then) =
+      __$$PatientInfoImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call(
+      {@JsonKey(name: '_id') String id,
+      int mobileNumber,
+      String fullName,
+      String gender,
+      int age});
+}
+
+/// @nodoc
+class __$$PatientInfoImplCopyWithImpl<$Res>
+    extends _$PatientInfoCopyWithImpl<$Res, _$PatientInfoImpl>
+    implements _$$PatientInfoImplCopyWith<$Res> {
+  __$$PatientInfoImplCopyWithImpl(
+      _$PatientInfoImpl _value, $Res Function(_$PatientInfoImpl) _then)
+      : super(_value, _then);
+
+  /// Create a copy of PatientInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? id = null,
+    Object? mobileNumber = null,
+    Object? fullName = null,
+    Object? gender = null,
+    Object? age = null,
+  }) {
+    return _then(_$PatientInfoImpl(
+      id: null == id
+          ? _value.id
+          : id // ignore: cast_nullable_to_non_nullable
+              as String,
+      mobileNumber: null == mobileNumber
+          ? _value.mobileNumber
+          : mobileNumber // ignore: cast_nullable_to_non_nullable
+              as int,
+      fullName: null == fullName
+          ? _value.fullName
+          : fullName // ignore: cast_nullable_to_non_nullable
+              as String,
+      gender: null == gender
+          ? _value.gender
+          : gender // ignore: cast_nullable_to_non_nullable
+              as String,
+      age: null == age
+          ? _value.age
+          : age // ignore: cast_nullable_to_non_nullable
+              as int,
+    ));
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$PatientInfoImpl implements _PatientInfo {
+  const _$PatientInfoImpl(
+      {@JsonKey(name: '_id') required this.id,
+      required this.mobileNumber,
+      required this.fullName,
+      required this.gender,
+      required this.age});
+
+  factory _$PatientInfoImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PatientInfoImplFromJson(json);
+
+  @override
+  @JsonKey(name: '_id')
+  final String id;
+  @override
+  final int mobileNumber;
+  @override
+  final String fullName;
+  @override
+  final String gender;
+  @override
+  final int age;
+
+  @override
+  String toString() {
+    return 'PatientInfo(id: $id, mobileNumber: $mobileNumber, fullName: $fullName, gender: $gender, age: $age)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$PatientInfoImpl &&
+            (identical(other.id, id) || other.id == id) &&
+            (identical(other.mobileNumber, mobileNumber) ||
+                other.mobileNumber == mobileNumber) &&
+            (identical(other.fullName, fullName) ||
+                other.fullName == fullName) &&
+            (identical(other.gender, gender) || other.gender == gender) &&
+            (identical(other.age, age) || other.age == age));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, id, mobileNumber, fullName, gender, age);
+
+  /// Create a copy of PatientInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$PatientInfoImplCopyWith<_$PatientInfoImpl> get copyWith =>
+      __$$PatientInfoImplCopyWithImpl<_$PatientInfoImpl>(this, _$identity);
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$PatientInfoImplToJson(
+      this,
+    );
+  }
+}
+
+abstract class _PatientInfo implements PatientInfo {
+  const factory _PatientInfo(
+      {@JsonKey(name: '_id') required final String id,
+      required final int mobileNumber,
+      required final String fullName,
+      required final String gender,
+      required final int age}) = _$PatientInfoImpl;
+
+  factory _PatientInfo.fromJson(Map<String, dynamic> json) =
+      _$PatientInfoImpl.fromJson;
+
+  @override
+  @JsonKey(name: '_id')
+  String get id;
+  @override
+  int get mobileNumber;
+  @override
+  String get fullName;
+  @override
+  String get gender;
+  @override
+  int get age;
+
+  /// Create a copy of PatientInfo
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$PatientInfoImplCopyWith<_$PatientInfoImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
 
@@ -378,11 +652,8 @@ mixin _$PatientCase {
   String get id => throw _privateConstructorUsedError;
   String get hospitalPatientId => throw _privateConstructorUsedError;
   bool get isOpen => throw _privateConstructorUsedError;
-  int get mobileNumber => throw _privateConstructorUsedError;
   int get updatedAt => throw _privateConstructorUsedError;
   String get hospitalId => throw _privateConstructorUsedError;
-  String get fullName => throw _privateConstructorUsedError;
-  String get gender => throw _privateConstructorUsedError;
   String get doctorId => throw _privateConstructorUsedError;
   String get creatorId => throw _privateConstructorUsedError;
   int get pageCount => throw _privateConstructorUsedError;
@@ -412,11 +683,8 @@ abstract class $PatientCaseCopyWith<$Res> {
       {@JsonKey(name: '_id') String id,
       String hospitalPatientId,
       bool isOpen,
-      int mobileNumber,
       int updatedAt,
       String hospitalId,
-      String fullName,
-      String gender,
       String doctorId,
       String creatorId,
       int pageCount,
@@ -444,11 +712,8 @@ class _$PatientCaseCopyWithImpl<$Res, $Val extends PatientCase>
     Object? id = null,
     Object? hospitalPatientId = null,
     Object? isOpen = null,
-    Object? mobileNumber = null,
     Object? updatedAt = null,
     Object? hospitalId = null,
-    Object? fullName = null,
-    Object? gender = null,
     Object? doctorId = null,
     Object? creatorId = null,
     Object? pageCount = null,
@@ -470,10 +735,6 @@ class _$PatientCaseCopyWithImpl<$Res, $Val extends PatientCase>
           ? _value.isOpen
           : isOpen // ignore: cast_nullable_to_non_nullable
               as bool,
-      mobileNumber: null == mobileNumber
-          ? _value.mobileNumber
-          : mobileNumber // ignore: cast_nullable_to_non_nullable
-              as int,
       updatedAt: null == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
@@ -481,14 +742,6 @@ class _$PatientCaseCopyWithImpl<$Res, $Val extends PatientCase>
       hospitalId: null == hospitalId
           ? _value.hospitalId
           : hospitalId // ignore: cast_nullable_to_non_nullable
-              as String,
-      fullName: null == fullName
-          ? _value.fullName
-          : fullName // ignore: cast_nullable_to_non_nullable
-              as String,
-      gender: null == gender
-          ? _value.gender
-          : gender // ignore: cast_nullable_to_non_nullable
               as String,
       doctorId: null == doctorId
           ? _value.doctorId
@@ -534,11 +787,8 @@ abstract class _$$PatientCaseImplCopyWith<$Res>
       {@JsonKey(name: '_id') String id,
       String hospitalPatientId,
       bool isOpen,
-      int mobileNumber,
       int updatedAt,
       String hospitalId,
-      String fullName,
-      String gender,
       String doctorId,
       String creatorId,
       int pageCount,
@@ -564,11 +814,8 @@ class __$$PatientCaseImplCopyWithImpl<$Res>
     Object? id = null,
     Object? hospitalPatientId = null,
     Object? isOpen = null,
-    Object? mobileNumber = null,
     Object? updatedAt = null,
     Object? hospitalId = null,
-    Object? fullName = null,
-    Object? gender = null,
     Object? doctorId = null,
     Object? creatorId = null,
     Object? pageCount = null,
@@ -590,10 +837,6 @@ class __$$PatientCaseImplCopyWithImpl<$Res>
           ? _value.isOpen
           : isOpen // ignore: cast_nullable_to_non_nullable
               as bool,
-      mobileNumber: null == mobileNumber
-          ? _value.mobileNumber
-          : mobileNumber // ignore: cast_nullable_to_non_nullable
-              as int,
       updatedAt: null == updatedAt
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
@@ -601,14 +844,6 @@ class __$$PatientCaseImplCopyWithImpl<$Res>
       hospitalId: null == hospitalId
           ? _value.hospitalId
           : hospitalId // ignore: cast_nullable_to_non_nullable
-              as String,
-      fullName: null == fullName
-          ? _value.fullName
-          : fullName // ignore: cast_nullable_to_non_nullable
-              as String,
-      gender: null == gender
-          ? _value.gender
-          : gender // ignore: cast_nullable_to_non_nullable
               as String,
       doctorId: null == doctorId
           ? _value.doctorId
@@ -649,11 +884,8 @@ class _$PatientCaseImpl implements _PatientCase {
       {@JsonKey(name: '_id') required this.id,
       required this.hospitalPatientId,
       this.isOpen = false,
-      required this.mobileNumber,
       required this.updatedAt,
       required this.hospitalId,
-      required this.fullName,
-      required this.gender,
       required this.doctorId,
       required this.creatorId,
       required this.pageCount,
@@ -676,15 +908,9 @@ class _$PatientCaseImpl implements _PatientCase {
   @JsonKey()
   final bool isOpen;
   @override
-  final int mobileNumber;
-  @override
   final int updatedAt;
   @override
   final String hospitalId;
-  @override
-  final String fullName;
-  @override
-  final String gender;
   @override
   final String doctorId;
   @override
@@ -715,7 +941,7 @@ class _$PatientCaseImpl implements _PatientCase {
 
   @override
   String toString() {
-    return 'PatientCase(id: $id, hospitalPatientId: $hospitalPatientId, isOpen: $isOpen, mobileNumber: $mobileNumber, updatedAt: $updatedAt, hospitalId: $hospitalId, fullName: $fullName, gender: $gender, doctorId: $doctorId, creatorId: $creatorId, pageCount: $pageCount, createdAt: $createdAt, pageNumbers: $pageNumbers, additionals: $additionals, v: $v)';
+    return 'PatientCase(id: $id, hospitalPatientId: $hospitalPatientId, isOpen: $isOpen, updatedAt: $updatedAt, hospitalId: $hospitalId, doctorId: $doctorId, creatorId: $creatorId, pageCount: $pageCount, createdAt: $createdAt, pageNumbers: $pageNumbers, additionals: $additionals, v: $v)';
   }
 
   @override
@@ -727,15 +953,10 @@ class _$PatientCaseImpl implements _PatientCase {
             (identical(other.hospitalPatientId, hospitalPatientId) ||
                 other.hospitalPatientId == hospitalPatientId) &&
             (identical(other.isOpen, isOpen) || other.isOpen == isOpen) &&
-            (identical(other.mobileNumber, mobileNumber) ||
-                other.mobileNumber == mobileNumber) &&
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
             (identical(other.hospitalId, hospitalId) ||
                 other.hospitalId == hospitalId) &&
-            (identical(other.fullName, fullName) ||
-                other.fullName == fullName) &&
-            (identical(other.gender, gender) || other.gender == gender) &&
             (identical(other.doctorId, doctorId) ||
                 other.doctorId == doctorId) &&
             (identical(other.creatorId, creatorId) ||
@@ -758,11 +979,8 @@ class _$PatientCaseImpl implements _PatientCase {
       id,
       hospitalPatientId,
       isOpen,
-      mobileNumber,
       updatedAt,
       hospitalId,
-      fullName,
-      gender,
       doctorId,
       creatorId,
       pageCount,
@@ -792,11 +1010,8 @@ abstract class _PatientCase implements PatientCase {
       {@JsonKey(name: '_id') required final String id,
       required final String hospitalPatientId,
       final bool isOpen,
-      required final int mobileNumber,
       required final int updatedAt,
       required final String hospitalId,
-      required final String fullName,
-      required final String gender,
       required final String doctorId,
       required final String creatorId,
       required final int pageCount,
@@ -816,15 +1031,9 @@ abstract class _PatientCase implements PatientCase {
   @override
   bool get isOpen;
   @override
-  int get mobileNumber;
-  @override
   int get updatedAt;
   @override
   String get hospitalId;
-  @override
-  String get fullName;
-  @override
-  String get gender;
   @override
   String get doctorId;
   @override

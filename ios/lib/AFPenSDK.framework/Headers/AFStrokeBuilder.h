@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 #import "AFStrokeOptions.h"
+#import "AFNode.h"
 NS_ASSUME_NONNULL_BEGIN
 
 @interface AFStrokeBuilder : NSObject

@@ -22,6 +22,8 @@ Map<String, dynamic> _$$PatientDetailsImplToJson(
     };
 
 _$DataImpl _$$DataImplFromJson(Map<String, dynamic> json) => _$DataImpl(
+      patientDetails:
+          PatientInfo.fromJson(json['patientDetails'] as Map<String, dynamic>),
       patientCases: (json['patientCases'] as List<dynamic>)
           .map((e) => PatientCase.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -29,7 +31,26 @@ _$DataImpl _$$DataImplFromJson(Map<String, dynamic> json) => _$DataImpl(
 
 Map<String, dynamic> _$$DataImplToJson(_$DataImpl instance) =>
     <String, dynamic>{
+      'patientDetails': instance.patientDetails,
       'patientCases': instance.patientCases,
+    };
+
+_$PatientInfoImpl _$$PatientInfoImplFromJson(Map<String, dynamic> json) =>
+    _$PatientInfoImpl(
+      id: json['_id'] as String,
+      mobileNumber: (json['mobileNumber'] as num).toInt(),
+      fullName: json['fullName'] as String,
+      gender: json['gender'] as String,
+      age: (json['age'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$$PatientInfoImplToJson(_$PatientInfoImpl instance) =>
+    <String, dynamic>{
+      '_id': instance.id,
+      'mobileNumber': instance.mobileNumber,
+      'fullName': instance.fullName,
+      'gender': instance.gender,
+      'age': instance.age,
     };
 
 _$PatientCaseImpl _$$PatientCaseImplFromJson(Map<String, dynamic> json) =>
@@ -37,11 +58,8 @@ _$PatientCaseImpl _$$PatientCaseImplFromJson(Map<String, dynamic> json) =>
       id: json['_id'] as String,
       hospitalPatientId: json['hospitalPatientId'] as String,
       isOpen: json['isOpen'] as bool? ?? false,
-      mobileNumber: (json['mobileNumber'] as num).toInt(),
       updatedAt: (json['updatedAt'] as num).toInt(),
       hospitalId: json['hospitalId'] as String,
-      fullName: json['fullName'] as String,
-      gender: json['gender'] as String,
       doctorId: json['doctorId'] as String,
       creatorId: json['creatorId'] as String,
       pageCount: (json['pageCount'] as num).toInt(),
@@ -60,11 +78,8 @@ Map<String, dynamic> _$$PatientCaseImplToJson(_$PatientCaseImpl instance) =>
       '_id': instance.id,
       'hospitalPatientId': instance.hospitalPatientId,
       'isOpen': instance.isOpen,
-      'mobileNumber': instance.mobileNumber,
       'updatedAt': instance.updatedAt,
       'hospitalId': instance.hospitalId,
-      'fullName': instance.fullName,
-      'gender': instance.gender,
       'doctorId': instance.doctorId,
       'creatorId': instance.creatorId,
       'pageCount': instance.pageCount,

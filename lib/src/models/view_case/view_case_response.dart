@@ -51,9 +51,9 @@ class ViewCaseData with _$ViewCaseData {
 @freezed
 class Patient with _$Patient {
   const factory Patient({
-    required String name,
-    required int mobileNumber,
-    required String gender,
+    String? name,
+    int? mobileNumber,
+    String? gender,
   }) = _Patient;
 
   factory Patient.empty() => const Patient(

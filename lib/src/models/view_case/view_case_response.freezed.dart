@@ -624,9 +624,9 @@ Patient _$PatientFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Patient {
-  String get name => throw _privateConstructorUsedError;
-  int get mobileNumber => throw _privateConstructorUsedError;
-  String get gender => throw _privateConstructorUsedError;
+  String? get name => throw _privateConstructorUsedError;
+  int? get mobileNumber => throw _privateConstructorUsedError;
+  String? get gender => throw _privateConstructorUsedError;
 
   /// Serializes this Patient to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -642,7 +642,7 @@ abstract class $PatientCopyWith<$Res> {
   factory $PatientCopyWith(Patient value, $Res Function(Patient) then) =
       _$PatientCopyWithImpl<$Res, Patient>;
   @useResult
-  $Res call({String name, int mobileNumber, String gender});
+  $Res call({String? name, int? mobileNumber, String? gender});
 }
 
 /// @nodoc
@@ -660,23 +660,23 @@ class _$PatientCopyWithImpl<$Res, $Val extends Patient>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? name = null,
-    Object? mobileNumber = null,
-    Object? gender = null,
+    Object? name = freezed,
+    Object? mobileNumber = freezed,
+    Object? gender = freezed,
   }) {
     return _then(_value.copyWith(
-      name: null == name
+      name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      mobileNumber: null == mobileNumber
+              as String?,
+      mobileNumber: freezed == mobileNumber
           ? _value.mobileNumber
           : mobileNumber // ignore: cast_nullable_to_non_nullable
-              as int,
-      gender: null == gender
+              as int?,
+      gender: freezed == gender
           ? _value.gender
           : gender // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
     ) as $Val);
   }
 }
@@ -688,7 +688,7 @@ abstract class _$$PatientImplCopyWith<$Res> implements $PatientCopyWith<$Res> {
       __$$PatientImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String name, int mobileNumber, String gender});
+  $Res call({String? name, int? mobileNumber, String? gender});
 }
 
 /// @nodoc
@@ -704,23 +704,23 @@ class __$$PatientImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? name = null,
-    Object? mobileNumber = null,
-    Object? gender = null,
+    Object? name = freezed,
+    Object? mobileNumber = freezed,
+    Object? gender = freezed,
   }) {
     return _then(_$PatientImpl(
-      name: null == name
+      name: freezed == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      mobileNumber: null == mobileNumber
+              as String?,
+      mobileNumber: freezed == mobileNumber
           ? _value.mobileNumber
           : mobileNumber // ignore: cast_nullable_to_non_nullable
-              as int,
-      gender: null == gender
+              as int?,
+      gender: freezed == gender
           ? _value.gender
           : gender // ignore: cast_nullable_to_non_nullable
-              as String,
+              as String?,
     ));
   }
 }
@@ -728,18 +728,17 @@ class __$$PatientImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$PatientImpl implements _Patient {
-  const _$PatientImpl(
-      {required this.name, required this.mobileNumber, required this.gender});
+  const _$PatientImpl({this.name, this.mobileNumber, this.gender});
 
   factory _$PatientImpl.fromJson(Map<String, dynamic> json) =>
       _$$PatientImplFromJson(json);
 
   @override
-  final String name;
+  final String? name;
   @override
-  final int mobileNumber;
+  final int? mobileNumber;
   @override
-  final String gender;
+  final String? gender;
 
   @override
   String toString() {
@@ -779,18 +778,18 @@ class _$PatientImpl implements _Patient {
 
 abstract class _Patient implements Patient {
   const factory _Patient(
-      {required final String name,
-      required final int mobileNumber,
-      required final String gender}) = _$PatientImpl;
+      {final String? name,
+      final int? mobileNumber,
+      final String? gender}) = _$PatientImpl;
 
   factory _Patient.fromJson(Map<String, dynamic> json) = _$PatientImpl.fromJson;
 
   @override
-  String get name;
+  String? get name;
   @override
-  int get mobileNumber;
+  int? get mobileNumber;
   @override
-  String get gender;
+  String? get gender;
 
   /// Create a copy of Patient
   /// with the given fields replaced by the non-null parameter values.

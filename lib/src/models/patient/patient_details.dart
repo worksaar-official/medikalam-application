@@ -18,6 +18,7 @@ class PatientDetails with _$PatientDetails {
 @freezed
 class Data with _$Data {
   const factory Data({
+    required PatientInfo patientDetails,
     required List<PatientCase> patientCases,
   }) = _Data;
 
@@ -25,16 +26,27 @@ class Data with _$Data {
 }
 
 @freezed
+class PatientInfo with _$PatientInfo {
+  const factory PatientInfo({
+    @JsonKey(name: '_id') required String id,
+    required int mobileNumber,
+    required String fullName,
+    required String gender,
+    required int age,
+  }) = _PatientInfo;
+
+  factory PatientInfo.fromJson(Map<String, dynamic> json) =>
+      _$PatientInfoFromJson(json);
+}
+
+@freezed
 class PatientCase with _$PatientCase {
   const factory PatientCase({
     @JsonKey(name: '_id') required String id,
     required String hospitalPatientId,
-    @Default(false)  bool isOpen,
-    required int mobileNumber,
+    @Default(false) bool isOpen,
     required int updatedAt,
     required String hospitalId,
-    required String fullName,
-    required String gender,
     required String doctorId,
     required String creatorId,
     required int pageCount,

@@ -36,8 +36,8 @@ class _CaseInfoState extends State<CaseInfo> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _title(
-                  name: provider.caseDetails.data!.patient.name ,
-                  gender: provider.caseDetails.data!.patient.gender,
+                  name: provider.caseDetails.data!.patient.name ?? 'N/A',
+                  gender: provider.caseDetails.data!.patient.gender ?? 'N/A',
                   age: "23 Years"),
               _profileInfo(
                   title: provider.caseDetails.data!.title,

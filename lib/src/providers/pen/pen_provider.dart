@@ -15,6 +15,7 @@ import 'package:Medikalam/src/core/pendriver/afpen.dart';
 import 'package:Medikalam/src/core/utils/constants/keys.dart';
 import 'package:Medikalam/src/core/utils/helpers/helpers.dart';
 import 'package:Medikalam/src/core/utils/helpers/notification_helper.dart';
+import 'package:Medikalam/src/core/utils/helpers/logger.dart';
 import 'package:Medikalam/src/models/pen/pen_event.dart';
 import 'package:Medikalam/src/models/pen/connected_pen.dart';
 
@@ -48,6 +49,7 @@ class PenProvider extends ChangeNotifier {
   }
 
   void setConnectedPen(PenEvent penEvent) {
+    logger.i('PEN_CONNECTION: Setting connected pen - MAC: ${penEvent.macAddress}, Device: ${penEvent.deviceName}');
     _connectedPen = ConnectedPen(
       macAddress: penEvent.macAddress,
       deviceName: penEvent.deviceName,
@@ -57,10 +59,12 @@ class PenProvider extends ChangeNotifier {
   }
 
   void addPenEvent(PenEvent penEvent) {
+    logger.i('PEN_EVENT: Received pen event - MAC: ${penEvent.macAddress}, Type: ${penEvent.penMsgType}, RSSI: ${penEvent.rssi}');
     if (!_penList.any((e) => e.macAddress == penEvent.macAddress)) {
       _penList.add(penEvent);
       if (_connectedPen == null &&
           Helpers.getString(key: Keys.connectedPenMac) == penEvent.macAddress) {
+        logger.i('PEN_AUTO_CONNECT: Auto-connecting to pen with MAC: ${penEvent.macAddress}');
         connect(penEvent.macAddress);
       }
       notifyListeners();
@@ -74,6 +78,7 @@ class PenProvider extends ChangeNotifier {
   }
 
   void penDisconnected() {
+    logger.w('PEN_DISCONNECTED: Pen disconnected - MAC: ${_connectedPen?.macAddress}');
     _penList.removeWhere(
         (element) => element.macAddress == _connectedPen?.macAddress);
     _connectedPen = null;
@@ -102,17 +107,30 @@ class PenProvider extends ChangeNotifier {
   }
 
   Future<void> connect(String macAddress) async {
-    setConnectedPen(PenEvent(
-        macAddress: macAddress, deviceName: '', rssi: 0, penMsgType: 0));
-    _penEventStreamController.add(macAddress);
-    showSuccess("Connected to Pen $macAddress");
-    await DPenCtrl.connect(macAddress);
-    Helpers.setString(key: Keys.connectedPenMac, value: macAddress);
+    logger.i('PEN_CONNECT: Attempting to connect to pen - MAC: $macAddress');
+    try {
+      setConnectedPen(PenEvent(
+          macAddress: macAddress, deviceName: '', rssi: 0, penMsgType: 0));
+      _penEventStreamController.add(macAddress);
+      showSuccess("Connected to Pen $macAddress");
+      await DPenCtrl.connect(macAddress);
+      Helpers.setString(key: Keys.connectedPenMac, value: macAddress);
+      logger.i('PEN_CONNECT_SUCCESS: Successfully connected to pen - MAC: $macAddress');
+    } catch (e) {
+      logger.e('PEN_CONNECT_FAILED: Failed to connect to pen - MAC: $macAddress, Error: $e');
+      rethrow;
+    }
   }
 
   Future<void> disconnectPen() async {
-    await DPenCtrl.disconnect();
-    penDisconnected();
-    _penEventStreamController.add(null);
+    logger.i('PEN_DISCONNECT: Manually disconnecting pen - MAC: ${_connectedPen?.macAddress}');
+    try {
+      await DPenCtrl.disconnect();
+      penDisconnected();
+      _penEventStreamController.add(null);
+      logger.i('PEN_DISCONNECT_SUCCESS: Successfully disconnected pen');
+    } catch (e) {
+      logger.e('PEN_DISCONNECT_FAILED: Failed to disconnect pen - Error: $e');
+    }
   }
 }

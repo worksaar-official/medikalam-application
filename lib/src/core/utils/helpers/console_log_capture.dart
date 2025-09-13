@@ -51,7 +51,12 @@ class ConsoleLogCapture {
     // Override debugPrint to capture logs
     debugPrint = (String? message, {int? wrapWidth}) {
       if (message != null) {
-        _addLog(message); // Don't add "DEBUG:" prefix to keep original format
+        // Check if this is a pen-related log and add special prefix
+        if (_isPenRelatedLog(message)) {
+          _addLog('PEN_FLUTTER: $message');
+        } else {
+          _addLog(message);
+        }
       }
       // Call original debugPrint
       debugPrintSynchronously(message, wrapWidth: wrapWidth);
@@ -69,33 +74,126 @@ class ConsoleLogCapture {
 
     // For now, we'll rely on the debugPrint override and platform channels
     // for comprehensive log capture
-    _addLog('STREAM_CAPTURE: Stream output capture initialized');
+    _addLog('FLUTTER: Stream output capture initialized');
   }
 
   /// Capture platform-specific logs (Android/iOS)
   Future<void> _capturePlatformLogs() async {
     try {
-      // For now, we'll rely on Flutter's built-in logging
-      // Platform-specific log capture can be added later if needed
-      _addLog('PLATFORM_CAPTURE: Platform log capture initialized');
-      logger.i('Platform log capture initialized (Flutter-only mode)');
+      // Initialize platform-specific log capture
+      await _initializePlatformChannel();
+
+      _addLog('SYSTEM: Platform log capture initialized');
+      logger.i('Platform log capture initialized (Enhanced mode)');
     } catch (e) {
       logger.e('Failed to initialize platform log capture: $e');
     }
   }
 
+  /// Initialize platform channel for iOS/Android log capture
+  Future<void> _initializePlatformChannel() async {
+    try {
+      const platform = MethodChannel('console_log_capture');
+
+      // Start platform log capture for both iOS and Android
+      await platform.invokeMethod('startLogCapture');
+
+      // Set up listener for platform logs
+      platform.setMethodCallHandler((call) async {
+        if (call.method == 'onLogReceived') {
+          final log = call.arguments as String?;
+          if (log != null) {
+            _addLog('NATIVE: $log');
+          }
+        }
+      });
+
+      // Get initial logs from platform
+      final platformLogs = await platform.invokeMethod<String>('getAllLogs');
+      if (platformLogs != null && platformLogs.isNotEmpty) {
+        final lines = platformLogs.split('\n');
+        for (final line in lines) {
+          if (line.isNotEmpty && line.trim().isNotEmpty) {
+            _addLog('NATIVE: $line');
+          }
+        }
+      }
+
+      logger.i('Platform channel initialized successfully');
+    } catch (e) {
+      logger.e('Failed to initialize platform channel: $e');
+      // Continue without platform channel - Flutter logs will still be captured
+    }
+  }
+
   /// Add a log entry to the buffer
   void _addLog(String log) {
-    // Add log exactly as it appears in console (no timestamp prefix)
-    _logs.add(log);
+    // Clean up the log message to remove excessive formatting
+    String cleanLog = _cleanLogMessage(log);
+
+    // Add timestamp for better readability
+    final timestamp = DateTime.now().toIso8601String();
+    final formattedLog = '[$timestamp] $cleanLog';
+
+    _logs.add(formattedLog);
 
     // Write to file immediately
-    _writeToFile(log);
+    _writeToFile(formattedLog);
 
     // Keep only last 1000 logs in memory
     if (_logs.length > 1000) {
       _logs.removeAt(0);
     }
+  }
+
+  /// Clean up log messages to remove excessive formatting
+  String _cleanLogMessage(String log) {
+    // Remove the decorative lines and excessive formatting
+    String cleaned = log
+        .replaceAll(RegExp(r'┌[─┄]*┐'), '') // Remove top decorative lines
+        .replaceAll(RegExp(r'└[─┄]*┘'), '') // Remove bottom decorative lines
+        .replaceAll(RegExp(r'├[┄]*┤'), '') // Remove middle decorative lines
+        .replaceAll(RegExp(r'│\s*#\d+'), '') // Remove stack trace numbers
+        .replaceAll(RegExp(r'│\s*'), '') // Remove left padding
+        .replaceAll(RegExp(r'^\s*'), '') // Remove leading whitespace
+        .replaceAll(
+            RegExp(r'\n+'), ' ') // Replace multiple newlines with single space
+        .trim();
+
+    // If the log is just decorative characters, return a simple message
+    if (cleaned.isEmpty || RegExp(r'^[┌└├┤│┄─\s]*$').hasMatch(cleaned)) {
+      return 'Log entry processed';
+    }
+
+    return cleaned;
+  }
+
+  /// Check if a log message is pen-related
+  bool _isPenRelatedLog(String message) {
+    final penKeywords = [
+      'pen',
+      'afpensdk',
+      'dpenctrl',
+      'bluetooth',
+      'ble',
+      'pen_',
+      'penmsg',
+      'penup',
+      'pendown',
+      'penmove',
+      'pendisconnect',
+      'penconnection',
+      'penpower',
+      'pen event',
+      'pen status',
+      'pen connected',
+      'pen disconnected',
+      'pen failed',
+      'pen error',
+    ];
+
+    final lowerMessage = message.toLowerCase();
+    return penKeywords.any((keyword) => lowerMessage.contains(keyword));
   }
 
   /// Public method to add logs from external sources (like HTTP interceptor)
@@ -209,7 +307,7 @@ class ConsoleLogCapture {
 
     // Simple test message
     final simpleTestLog =
-        'SIMPLE TEST: Hello from Medikalam app at ${DateTime.now()}';
+        'TEST: Hello from Medikalam app at ${DateTime.now().toIso8601String()}';
 
     final testLogData = {
       'logs': simpleTestLog,
@@ -226,7 +324,9 @@ class ConsoleLogCapture {
 
     // Try sending as array format
     final testLogData = {
-      'logs': ['TEST ARRAY: Hello from Medikalam app at ${DateTime.now()}'],
+      'logs': [
+        'TEST_ARRAY: Hello from Medikalam app at ${DateTime.now().toIso8601String()}'
+      ],
     };
 
     logger.d('Alternative test upload data: $testLogData');

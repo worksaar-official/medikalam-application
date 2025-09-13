@@ -1,7 +1,10 @@
 // Package imports:
 import 'package:logger/logger.dart';
 
-final logger = Logger(printer: PrettyPrinter(), filter: EnableLogging());
+final logger = Logger(
+  printer: SimplePrinter(),
+  filter: EnableLogging(),
+);
 
 class EnableLogging extends LogFilter {
   @override

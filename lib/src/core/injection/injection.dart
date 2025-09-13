@@ -1,6 +1,7 @@
 // Package imports:
 
 // Flutter imports:
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 // Package imports:
@@ -8,7 +9,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // Project imports:
@@ -39,9 +39,13 @@ Future<void> localInjection() async {
       baseUrl: EndPoints.apiBaseUrl,
       sendTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30)));
-  // Add PrettyDioLogger for console display
-  dio.interceptors.add(PrettyDioLogger(
-      requestHeader: true, requestBody: true, responseHeader: true));
+  // Add simple HTTP logger for console display
+  dio.interceptors.add(LogInterceptor(
+      requestHeader: true,
+      requestBody: true,
+      responseHeader: true,
+      responseBody: true,
+      logPrint: (obj) => debugPrint('[HTTP] $obj')));
 
   // Add our custom HTTP log capture interceptor to send logs to website
   dio.interceptors.add(HttpLogCaptureInterceptor());

@@ -18,7 +18,7 @@ public class ConsoleLogCapturePlugin: NSObject, FlutterPlugin {
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
     
-    public func handle(_ call: FlutterCall, result: @escaping FlutterResult) {
+    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
         case "startLogCapture":
             startLogCapture(result: result)
@@ -70,14 +70,10 @@ public class ConsoleLogCapturePlugin: NSObject, FlutterPlugin {
     }
     
     private func startNSLogCapture() {
-        // Override NSLog to capture logs
-        // Note: This is a simplified approach - in production you might want to use method swizzling
-        let originalNSLog = NSLog
-        NSLog = { format, args in
-            let message = String(format: format, args)
-            self.sendLogToFlutter("NSLOG: \(message)")
-            originalNSLog(format, args)
-        }
+        // Note: Direct NSLog override is not possible in Swift
+        // This is a placeholder for NSLog capture functionality
+        // In production, you might want to use method swizzling or other techniques
+        print("ConsoleLogCapture: NSLog capture started (limited functionality)")
     }
     
     private func startOSLogCapture() {
@@ -111,7 +107,7 @@ public class ConsoleLogCapturePlugin: NSObject, FlutterPlugin {
     
     private func captureAppState(timestamp: String) {
         // Capture memory usage
-        let memoryInfo = mach_task_basic_info()
+        var memoryInfo = mach_task_basic_info()
         var count = mach_msg_type_number_t(MemoryLayout<mach_task_basic_info>.size)/4
         
         let result: kern_return_t = withUnsafeMutablePointer(to: &memoryInfo) {
@@ -248,7 +244,7 @@ public class ConsoleLogCapturePlugin: NSObject, FlutterPlugin {
         }
     }
     
-    private func uploadLogs(call: FlutterCall, result: @escaping FlutterResult) {
+    private func uploadLogs(call: FlutterMethodCall, result: @escaping FlutterResult) {
         do {
             guard let logData = call.arguments as? [String: Any],
                   let logDataString = logData["logData"] as? String else {

@@ -98,7 +98,9 @@ class AppDelegate: FlutterAppDelegate, AFPenCommParserStrokeHandler, AFPenCommMa
         GeneratedPluginRegistrant.register(with: self)
         
         // Register console log capture plugin
-        ConsoleLogCapturePlugin.register(with: self)
+        if let registrar = self.registrar(forPlugin: "ConsoleLogCapturePlugin") {
+            ConsoleLogCapturePlugin.register(with: registrar)
+        }
         
         let controller = window?.rootViewController as! FlutterViewController
         let binaryMessenger = controller.binaryMessenger

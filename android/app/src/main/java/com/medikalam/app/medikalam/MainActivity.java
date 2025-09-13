@@ -32,6 +32,9 @@ public class MainActivity extends FlutterActivity {
     @Override
     public void configureFlutterEngine(FlutterEngine flutterEngine) {
         super.configureFlutterEngine(flutterEngine);
+        
+        // Register ConsoleLogCapturePlugin
+        flutterEngine.getPlugins().add(new ConsoleLogCapturePlugin());
 
         new EventChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), EVENT_CHANNEL_MSG)
             .setStreamHandler(new EventChannel.StreamHandler() {

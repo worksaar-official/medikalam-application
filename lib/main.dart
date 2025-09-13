@@ -22,6 +22,7 @@ import 'package:Medikalam/src/core/utils/environment/environment.dart';
 import 'package:Medikalam/src/core/utils/helpers/permission_helper.dart';
 import 'package:Medikalam/src/providers/provider.dart';
 import 'package:Medikalam/src/providers/pen/pen_provider.dart';
+import 'package:Medikalam/src/core/utils/helpers/console_log_capture.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,6 +46,9 @@ Future<void> main() async {
 Future<void> _initializeApp() async {
   await localInjection();
   configureDependencies();
+
+  // Initialize console log capture
+  await ConsoleLogCapture().initialize();
 
   // Reset pen connection state before creating app
   await getIt<PenProvider>().resetConnectionState();

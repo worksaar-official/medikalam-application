@@ -18,6 +18,7 @@ import 'package:Medikalam/src/core/utils/constants/api_endpoints.dart';
 import 'package:Medikalam/src/core/utils/constants/colors.dart';
 import 'package:Medikalam/src/core/utils/helpers/cache_utils.dart';
 import 'package:Medikalam/src/core/utils/helpers/helpers.dart';
+import 'package:Medikalam/src/core/utils/helpers/http_log_capture_interceptor.dart';
 import 'injection.config.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -38,8 +39,13 @@ Future<void> localInjection() async {
       baseUrl: EndPoints.apiBaseUrl,
       sendTimeout: const Duration(seconds: 30),
       receiveTimeout: const Duration(seconds: 30)));
+  // Add PrettyDioLogger for console display
   dio.interceptors.add(PrettyDioLogger(
       requestHeader: true, requestBody: true, responseHeader: true));
+
+  // Add our custom HTTP log capture interceptor to send logs to website
+  dio.interceptors.add(HttpLogCaptureInterceptor());
+
   final token = Helpers.getString(key: "token");
   if (token != null) {
     dio.options.headers["x-access-token"] = Helpers.getString(key: "token");

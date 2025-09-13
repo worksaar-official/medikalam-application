@@ -96,6 +96,10 @@ class AppDelegate: FlutterAppDelegate, AFPenCommParserStrokeHandler, AFPenCommMa
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         GeneratedPluginRegistrant.register(with: self)
+        
+        // Register console log capture plugin
+        ConsoleLogCapturePlugin.register(with: self)
+        
         let controller = window?.rootViewController as! FlutterViewController
         let binaryMessenger = controller.binaryMessenger
 

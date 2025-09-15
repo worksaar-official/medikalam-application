@@ -37,6 +37,14 @@ class PenProvider extends ChangeNotifier {
       StreamController<String?>.broadcast();
   Stream<String?> get penEventStream => _penEventStreamController.stream;
 
+  // Add method to get saved pen MAC address
+  String? get savedPenMacAddress =>
+      Helpers.getString(key: Keys.connectedPenMac);
+
+  // Add method to check if we should auto-reconnect
+  bool get shouldAutoReconnect =>
+      savedPenMacAddress != null && _connectedPen == null;
+
   @override
   void dispose() {
     _penEventStreamController.close();
@@ -49,7 +57,8 @@ class PenProvider extends ChangeNotifier {
   }
 
   void setConnectedPen(PenEvent penEvent) {
-    logger.i('PEN_CONNECTION: Setting connected pen - MAC: ${penEvent.macAddress}, Device: ${penEvent.deviceName}');
+    logger.i(
+        'PEN_CONNECTION: Setting connected pen - MAC: ${penEvent.macAddress}, Device: ${penEvent.deviceName}');
     _connectedPen = ConnectedPen(
       macAddress: penEvent.macAddress,
       deviceName: penEvent.deviceName,
@@ -59,13 +68,20 @@ class PenProvider extends ChangeNotifier {
   }
 
   void addPenEvent(PenEvent penEvent) {
-    logger.i('PEN_EVENT: Received pen event - MAC: ${penEvent.macAddress}, Type: ${penEvent.penMsgType}, RSSI: ${penEvent.rssi}');
+    logger.i(
+        'PEN_EVENT: Received pen event - MAC: ${penEvent.macAddress}, Type: ${penEvent.penMsgType}, RSSI: ${penEvent.rssi}');
     if (!_penList.any((e) => e.macAddress == penEvent.macAddress)) {
       _penList.add(penEvent);
-      if (_connectedPen == null &&
-          Helpers.getString(key: Keys.connectedPenMac) == penEvent.macAddress) {
-        logger.i('PEN_AUTO_CONNECT: Auto-connecting to pen with MAC: ${penEvent.macAddress}');
-        connect(penEvent.macAddress);
+
+      // Auto-connect if this is the previously connected pen
+      final savedMacAddress = Helpers.getString(key: Keys.connectedPenMac);
+      if (_connectedPen == null && savedMacAddress == penEvent.macAddress) {
+        logger.i(
+            'PEN_AUTO_CONNECT: Auto-connecting to previously connected pen - MAC: ${penEvent.macAddress}');
+        connect(penEvent.macAddress).catchError((error) {
+          logger.e(
+              'PEN_AUTO_CONNECT_FAILED: Failed to auto-connect - Error: $error');
+        });
       }
       notifyListeners();
     }
@@ -78,23 +94,47 @@ class PenProvider extends ChangeNotifier {
   }
 
   void penDisconnected() {
-    logger.w('PEN_DISCONNECTED: Pen disconnected - MAC: ${_connectedPen?.macAddress}');
+    logger.w(
+        'PEN_DISCONNECTED: Pen disconnected - MAC: ${_connectedPen?.macAddress}');
     _penList.removeWhere(
         (element) => element.macAddress == _connectedPen?.macAddress);
     _connectedPen = null;
     setShowSvg(false);
     showSuccess("Pen Disconnected");
+
+    // ⭐ Trigger pen event stream to restart BLE scanning after disconnect
+    logger
+        .i('PEN_DISCONNECT_RESTART: Triggering BLE restart for auto-reconnect');
+    _penEventStreamController.add("restart_scanning");
+
     notifyListeners();
   }
 
-  Future<void> resetConnectionState() async {
+  Future<void> resetConnectionState({bool preserveMacAddress = true}) async {
+    logger.i(
+        'PEN_RESET: Resetting connection state, preserveMacAddress: $preserveMacAddress');
+
+    // Store MAC address before reset if we want to preserve it
+    String? savedMacAddress;
+    if (preserveMacAddress) {
+      savedMacAddress = Helpers.getString(key: Keys.connectedPenMac);
+    }
+
     // Force hardware disconnect
     await DPenCtrl.disconnect().catchError((_) {});
 
     // Clear all connection state
     _connectedPen = null;
     _penList.clear();
-    Helpers.deleteString(key: Keys.connectedPenMac);
+
+    // Only delete MAC address if not preserving it
+    if (!preserveMacAddress) {
+      Helpers.deleteString(key: Keys.connectedPenMac);
+    } else if (savedMacAddress != null) {
+      // Restore the MAC address
+      Helpers.setString(key: Keys.connectedPenMac, value: savedMacAddress);
+      logger.i('PEN_RESET: Preserved MAC address: $savedMacAddress');
+    }
 
     // Notify listeners
     _penEventStreamController.add(null);
@@ -115,15 +155,18 @@ class PenProvider extends ChangeNotifier {
       showSuccess("Connected to Pen $macAddress");
       await DPenCtrl.connect(macAddress);
       Helpers.setString(key: Keys.connectedPenMac, value: macAddress);
-      logger.i('PEN_CONNECT_SUCCESS: Successfully connected to pen - MAC: $macAddress');
+      logger.i(
+          'PEN_CONNECT_SUCCESS: Successfully connected to pen - MAC: $macAddress');
     } catch (e) {
-      logger.e('PEN_CONNECT_FAILED: Failed to connect to pen - MAC: $macAddress, Error: $e');
+      logger.e(
+          'PEN_CONNECT_FAILED: Failed to connect to pen - MAC: $macAddress, Error: $e');
       rethrow;
     }
   }
 
   Future<void> disconnectPen() async {
-    logger.i('PEN_DISCONNECT: Manually disconnecting pen - MAC: ${_connectedPen?.macAddress}');
+    logger.i(
+        'PEN_DISCONNECT: Manually disconnecting pen - MAC: ${_connectedPen?.macAddress}');
     try {
       await DPenCtrl.disconnect();
       penDisconnected();
@@ -131,6 +174,62 @@ class PenProvider extends ChangeNotifier {
       logger.i('PEN_DISCONNECT_SUCCESS: Successfully disconnected pen');
     } catch (e) {
       logger.e('PEN_DISCONNECT_FAILED: Failed to disconnect pen - Error: $e');
+    }
+  }
+
+  Future<bool> checkHardwareConnectionStatus() async {
+    try {
+      final bool isConnected = await DPenCtrl.isConnected();
+      final int connectionStatus = await DPenCtrl.getConnectionStatus();
+
+      logger.i(
+          'PEN_HARDWARE_STATUS: isConnected=$isConnected, status=$connectionStatus');
+
+      // Sync our state with hardware state
+      if (!isConnected && _connectedPen != null) {
+        logger.w(
+            'PEN_STATE_SYNC: Hardware says disconnected but we think connected, syncing...');
+        penDisconnected();
+      }
+
+      return isConnected;
+    } catch (e) {
+      logger.e(
+          'PEN_HARDWARE_STATUS_CHECK_FAILED: Error checking hardware status - $e');
+      return false;
+    }
+  }
+
+  Future<void> setUserLoginStatus(bool isLoggedIn) async {
+    try {
+      logger.i('PEN_USER_LOGIN_STATUS: Setting login status to $isLoggedIn');
+      await DPenCtrl.setUserLoginStatus(isLoggedIn);
+
+      if (isLoggedIn) {
+        logger.i(
+            'PEN_AUTO_RECONNECT: User logged in, auto-reconnect enabled for iOS');
+        // Enable auto-reconnect if we have a saved pen and not currently connected
+        if (savedPenMacAddress != null && !isConnected) {
+          await DPenCtrl.setAutoReconnectEnabled(true);
+          logger.i('PEN_AUTO_RECONNECT: Auto-reconnect enabled for saved pen');
+        }
+      } else {
+        logger
+            .i('PEN_AUTO_RECONNECT: User logged out, disabling auto-reconnect');
+        await DPenCtrl.setAutoReconnectEnabled(false);
+      }
+    } catch (e) {
+      logger.e('PEN_LOGIN_STATUS_ERROR: Failed to set login status - $e');
+    }
+  }
+
+  Future<void> setAutoReconnectEnabled(bool enabled) async {
+    try {
+      logger
+          .i('PEN_AUTO_RECONNECT_SETTING: Setting auto-reconnect to $enabled');
+      await DPenCtrl.setAutoReconnectEnabled(enabled);
+    } catch (e) {
+      logger.e('PEN_AUTO_RECONNECT_ERROR: Failed to set auto-reconnect - $e');
     }
   }
 }

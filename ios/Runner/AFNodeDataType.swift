@@ -9,9 +9,10 @@ import Foundation
 
 
 enum PenMsgType: NSInteger {
-    case findDevice = 5
-    case connected = 2
-    case disConnected = 4
+    case findDevice = 5      // Keep as 5 for device discovery
+    case connected = 2       // Keep as 2 for connection success  
+    case disConnected = 3    // Change to 3 to match Android PEN_DISCONNECTED
+    case connectionFailure = 4 // Add connection failure status
 }
 
 struct EncodableAFNode: Encodable {

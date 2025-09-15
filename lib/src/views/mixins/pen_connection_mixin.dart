@@ -54,6 +54,27 @@ mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
     });
   }
 
+  void restartBleForAutoReconnect() {
+    logger.i("PEN_BLE_RESTART: Restarting BLE scanning for auto-reconnect");
+
+    // Clear previous pen list
+    _penProvider.clearList();
+
+    // Restart BLE scanning
+    DPenCtrl.btStartForPeripheralsList().then((result) {
+      logger.i("PEN_BLE_RESTART_RESULT: Scan restart result: $result");
+    }).catchError((error) {
+      logger.e("PEN_BLE_RESTART_ERROR: Failed to restart scan: $error");
+    });
+
+    // Ensure event listeners are active
+    DPenCtrl.eventChannel.receiveBroadcastStream().listen((event) {
+      final obj = json.decode(event);
+      logger.d("PEN_BLE_RESTART_EVENT: Received event: $obj");
+      _handleEvent(obj);
+    });
+  }
+
   void startListener() {
     startPenStateListener();
     startDotListener();
@@ -84,23 +105,68 @@ mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
   void _handleEvent(Map<String, dynamic> object) {
     logger.d("PEN_EVENT_HANDLER: Processing event: $object");
 
+    // Handle connection success events (both Android and iOS)
+    if (object.containsKey("success") && object["success"] == 1) {
+      logger.i("PEN_CONNECTION_SUCCESS: Pen connected successfully");
+      // Get the connected pen info from penMsgType if available
+      final penMsgType = object["penMsgType"];
+      if (penMsgType == 2) {
+        // iOS connected status
+        logger.i("PEN_iOS_CONNECTION_SUCCESS: iOS pen connection confirmed");
+      }
+      return;
+    }
+
+    // Handle pen discovery events
     if (object.containsKey("STRING_PEN_MAC_ADDRESS")) {
       final penEvent = PenEvent.fromJson(object);
       logger.i(
           "PEN_EVENT_PROCESSED: MAC: ${penEvent.macAddress}, Type: ${penEvent.penMsgType}, RSSI: ${penEvent.rssi}");
 
       // NOTE: penMsgType values are based on native SDK constants
-      // 0: PEN_UP, 1: PEN_DOWN, 2: PEN_MOVE, 3: PEN_DISCONNECTED, 4: PEN_CONNECTION_FAILURE, 5: PEN_POWER_OFF
-      if (penEvent.penMsgType == 3 || penEvent.penMsgType == 4) {
-        logger.w(
-            "PEN_DISCONNECTION_EVENT: Pen disconnected or connection failed - Type: ${penEvent.penMsgType}");
-        _penProvider.penDisconnected();
+      // Android: 0=FIND_DEVICE, 1=PEN_CONNECTION_SUCCESS, 2=PEN_DISCONNECTED
+      // iOS: 2=connected, 3=disConnected, 4=connectionFailure, 5=findDevice
+      if (penEvent.penMsgType == 3 ||
+          penEvent.penMsgType == 4 ||
+          penEvent.penMsgType == 2) {
+        // Handle disconnection events (Android type 2, iOS type 3 & 4)
+        if (penEvent.penMsgType == 2 && object.containsKey("disconnected")) {
+          // This is Android disconnect event
+          logger.w("PEN_ANDROID_DISCONNECT: Android pen disconnected");
+          _penProvider.penDisconnected();
+        } else if (penEvent.penMsgType == 3 || penEvent.penMsgType == 4) {
+          // This is iOS disconnect/failure event
+          logger.w(
+              "PEN_iOS_DISCONNECT: iOS pen disconnected or failed - Type: ${penEvent.penMsgType}");
+          _penProvider.penDisconnected();
+        }
+      } else if (penEvent.penMsgType == 5 || penEvent.penMsgType == 0) {
+        // Handle device discovery (iOS type 5, Android type 0)
+        logger
+            .i("PEN_DEVICE_FOUND: Device discovered - ${penEvent.deviceName}");
+        _penProvider.addPenEvent(penEvent);
       } else {
+        // Handle other pen events (movement, etc.)
         _penProvider.addPenEvent(penEvent);
       }
     } else if (object.containsKey("disconnected")) {
       logger.w("PEN_DISCONNECTED_EVENT: Generic disconnect event received");
       _penProvider.penDisconnected();
+    } else if (object.containsKey("autoReconnectAttempt")) {
+      logger.i("PEN_AUTO_RECONNECT_ATTEMPT: Auto-reconnect attempt detected");
+      final penMac = object["penMac"] as String?;
+      final penName = object["penName"] as String?;
+      logger.i(
+          "PEN_AUTO_RECONNECT_INFO: Attempting to reconnect to $penName ($penMac)");
+    } else if (object.containsKey("autoReconnectScan")) {
+      logger.i("PEN_AUTO_RECONNECT_SCAN: Auto-reconnect scan detected");
+      final targetMac = object["targetMac"] as String?;
+      final targetName = object["targetName"] as String?;
+      logger.i(
+          "PEN_AUTO_RECONNECT_SCAN_INFO: Looking for $targetName ($targetMac)");
+
+      // Use dedicated restart method for auto-reconnect
+      restartBleForAutoReconnect();
     } else if (object.containsKey("page")) {
       logger.d(
           "PEN_DOT_EVENT: Pen dot event - X: ${object['x']}, Y: ${object['y']}, Page: ${object['page']}");

@@ -54,4 +54,46 @@ class DPenCtrl {
       debugPrint("${e.message}");
     }
   }
+
+  static Future<bool> isConnected() async {
+    try {
+      final bool result = await _channel.invokeMethod('isConnected');
+      return result;
+    } on PlatformException catch (e) {
+      debugPrint("Failed to check connection status: ${e.message}");
+      return false;
+    }
+  }
+
+  static Future<int> getConnectionStatus() async {
+    try {
+      final int result = await _channel.invokeMethod('getConnectionStatus');
+      return result;
+    } on PlatformException catch (e) {
+      debugPrint("Failed to get connection status: ${e.message}");
+      return -1;
+    }
+  }
+
+  static Future<bool> setUserLoginStatus(bool isLoggedIn) async {
+    try {
+      final bool result = await _channel
+          .invokeMethod('setUserLoginStatus', {'isLoggedIn': isLoggedIn});
+      return result;
+    } on PlatformException catch (e) {
+      debugPrint("Failed to set user login status: ${e.message}");
+      return false;
+    }
+  }
+
+  static Future<bool> setAutoReconnectEnabled(bool enabled) async {
+    try {
+      final bool result = await _channel
+          .invokeMethod('setAutoReconnectEnabled', {'enabled': enabled});
+      return result;
+    } on PlatformException catch (e) {
+      debugPrint("Failed to set auto-reconnect enabled: ${e.message}");
+      return false;
+    }
+  }
 }

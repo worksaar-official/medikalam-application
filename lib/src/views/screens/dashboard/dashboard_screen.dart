@@ -16,8 +16,6 @@ import 'package:Medikalam/services/routing/utils/extensions/screen_name_extensio
 import 'package:Medikalam/src/core/utils/constants/colors.dart';
 import 'package:Medikalam/src/core/utils/constants/constant.dart';
 import 'package:Medikalam/src/core/utils/constants/extensions.dart';
-import 'package:Medikalam/src/core/utils/constants/keys.dart';
-import 'package:Medikalam/src/core/utils/helpers/helpers.dart';
 import 'package:Medikalam/src/providers/dashboard/dashboard_provider.dart';
 import 'package:Medikalam/src/providers/pen/pen_provider.dart';
 import 'package:Medikalam/src/providers/permission/permission_provider.dart';
@@ -27,7 +25,6 @@ import 'package:Medikalam/src/views/widgets/bottomsheet/connection_bottomsheet.d
 import 'package:Medikalam/src/views/widgets/custom_container/custom_container_widget.dart';
 import 'package:Medikalam/src/views/widgets/wrapper/shimmer_handler.dart';
 import 'package:Medikalam/src/core/utils/helpers/logger.dart';
-import 'package:Medikalam/src/core/utils/helpers/notification_helper.dart';
 
 import '../../../core/utils/helpers/notification_helper.dart'
     as NotificationHelper;
@@ -53,50 +50,40 @@ class _DashboardScreenState extends State<DashboardScreen>
       context.read<PrescriptionProvider>().addSymbols();
       final penProvider = context.read<PenProvider>();
 
-      // Try to connect to the pen if it is already connected
+      // Listen for pen events
       penProvider.penEventStream.listen((event) {
         if (event != null) {
-          startListener();
-          startBle();
+          logger.i('DASHBOARD: Pen event received: $event');
+
+          // If it's a restart_scanning event or regular pen connection
+          if (event == "restart_scanning") {
+            logger.i('DASHBOARD: Restarting BLE scanning after disconnect');
+            startListener();
+            startBle(
+                clear: true); // Clear previous pen list and restart scanning
+          } else {
+            // Regular pen connection event
+            startListener();
+            startBle();
+          }
         } else {
           penProvider.penDisconnected();
         }
       });
-      // final mac = Helpers.getString(key: Keys.connectedPenMac);
 
-      // if (mac != null) {
-      //   final clear = penProvider.connectedPen == null;
-      //   startListener();
-      //   startBle(clear: clear);
-      //   penConnectionBottomSheet(context: context);
-      // }
+      // Check for previously connected pen and setup auto-reconnection
+      if (penProvider.shouldAutoReconnect) {
+        final mac = penProvider.savedPenMacAddress!;
+        logger.i(
+            'DASHBOARD: Found previously connected pen MAC: $mac, setting up auto-reconnection');
 
-      final mac = Helpers.getString(key: Keys.connectedPenMac);
-      if (mac != null) {
-        final clear = penProvider.connectedPen == null;
+        // Start listeners and BLE scanning for auto-reconnection
         startListener();
+        startBle(clear: true);
 
-        connect(mac).then((_) {
-          startBle(clear: clear);
-
-          // Wait and check if pen list gets populated
-          Future.delayed(const Duration(seconds: 1), () {
-            final penList = context.read<PenProvider>().penList;
-            if (penList.isNotEmpty) {
-              penConnectionBottomSheet(context: context);
-            } else {
-              // Retry once after a short delay if still empty
-              Future.delayed(const Duration(seconds: 1), () {
-                final secondTryList = context.read<PenProvider>().penList;
-                if (secondTryList.isNotEmpty) {
-                  penConnectionBottomSheet(context: context);
-                } else {
-                  debugPrint("No pens found to show in bottom sheet.");
-                }
-              });
-            }
-          });
-        });
+        // Log that we're ready for auto-reconnection
+        logger.i(
+            'DASHBOARD: Auto-reconnection ready. Pen will connect when cap is opened.');
       }
     });
   }

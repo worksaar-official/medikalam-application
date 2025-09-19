@@ -25,6 +25,7 @@ import 'package:Medikalam/src/views/widgets/bottomsheet/connection_bottomsheet.d
 import 'package:Medikalam/src/views/widgets/custom_container/custom_container_widget.dart';
 import 'package:Medikalam/src/views/widgets/wrapper/shimmer_handler.dart';
 import 'package:Medikalam/src/core/utils/helpers/logger.dart';
+import 'package:Medikalam/src/core/services/navigation_service.dart';
 
 import '../../../core/utils/helpers/notification_helper.dart'
     as NotificationHelper;
@@ -49,6 +50,9 @@ class _DashboardScreenState extends State<DashboardScreen>
       context.read<PrescriptionProvider>().getPageConfig();
       context.read<PrescriptionProvider>().addSymbols();
       final penProvider = context.read<PenProvider>();
+
+      // Update navigation context for dashboard
+      NavigationService.instance.setContext(context);
 
       // Listen for pen events
       penProvider.penEventStream.listen((event) {

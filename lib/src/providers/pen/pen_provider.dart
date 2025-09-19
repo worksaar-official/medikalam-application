@@ -37,6 +37,9 @@ class PenProvider extends ChangeNotifier {
       StreamController<String?>.broadcast();
   Stream<String?> get penEventStream => _penEventStreamController.stream;
 
+  // Callback to reset auto-navigation when pen disconnects
+  VoidCallback? _resetAutoNavigationCallback;
+
   // Add method to get saved pen MAC address
   String? get savedPenMacAddress =>
       Helpers.getString(key: Keys.connectedPenMac);
@@ -102,12 +105,20 @@ class PenProvider extends ChangeNotifier {
     setShowSvg(false);
     showSuccess("Pen Disconnected");
 
+    // Reset auto-navigation flag when pen disconnects
+    _resetAutoNavigationCallback?.call();
+
     // ⭐ Trigger pen event stream to restart BLE scanning after disconnect
     logger
         .i('PEN_DISCONNECT_RESTART: Triggering BLE restart for auto-reconnect');
     _penEventStreamController.add("restart_scanning");
 
     notifyListeners();
+  }
+
+  /// Set callback to reset auto-navigation when pen disconnects
+  void setResetAutoNavigationCallback(VoidCallback? callback) {
+    _resetAutoNavigationCallback = callback;
   }
 
   Future<void> resetConnectionState({bool preserveMacAddress = true}) async {

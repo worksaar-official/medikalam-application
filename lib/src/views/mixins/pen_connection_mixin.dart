@@ -14,16 +14,31 @@ import 'package:Medikalam/src/models/pen/afdot.dart';
 import 'package:Medikalam/src/models/pen/pen_event.dart';
 import 'package:Medikalam/src/providers/pen/pen_provider.dart';
 import 'package:Medikalam/src/providers/prescription/prescription_provider.dart';
+import 'package:Medikalam/src/core/services/navigation_service.dart';
 
 mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
   late PenProvider _penProvider;
   PrescriptionProvider get _prescriptionProvider =>
       context.read<PrescriptionProvider>();
 
+  // Flag to track if auto-navigation has already occurred for this session
+  bool _hasAutoNavigated = false;
+
   @override
   void initState() {
     super.initState();
     _penProvider = context.read<PenProvider>();
+    // Set navigation context for auto-navigation
+    NavigationService.instance.setContext(context);
+    // Register callback to reset auto-navigation when pen disconnects
+    _penProvider.setResetAutoNavigationCallback(resetAutoNavigation);
+  }
+
+  @override
+  void dispose() {
+    // Clear navigation context when widget is disposed
+    NavigationService.instance.clearContext();
+    super.dispose();
   }
 
   void init() {
@@ -170,6 +185,10 @@ mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
     } else if (object.containsKey("page")) {
       logger.d(
           "PEN_DOT_EVENT: Pen dot event - X: ${object['x']}, Y: ${object['y']}, Page: ${object['page']}");
+
+      // Auto-navigate to prescription page if user is on dashboard and pen is connected
+      _handleAutoNavigation();
+
       _prescriptionProvider.getSymbolName(double.parse(object['x'].toString()),
           double.parse(object['y'].toString()));
       _prescriptionProvider.addDotToStream(Afdot.fromJson(object));
@@ -192,5 +211,31 @@ mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
       logger.e("Pen connection failed: $e");
       rethrow;
     }
+  }
+
+  /// Handle automatic navigation to prescription page when user starts writing
+  void _handleAutoNavigation() {
+    // Only auto-navigate once per session and if pen is connected
+    if (_hasAutoNavigated || !_penProvider.isConnected) {
+      return;
+    }
+
+    // Check if user is on dashboard
+    if (NavigationService.instance.isOnDashboard) {
+      logger.i(
+          "PEN_AUTO_NAV: User started writing on dashboard, auto-navigating to prescription page");
+      _hasAutoNavigated = true;
+
+      // Set isScan to false before navigation
+      _prescriptionProvider.isScan = false;
+
+      // Navigate to prescription page
+      NavigationService.instance.navigateToPrescriptionPaper();
+    }
+  }
+
+  /// Reset auto-navigation flag (can be called when pen disconnects)
+  void resetAutoNavigation() {
+    _hasAutoNavigated = false;
   }
 }

@@ -133,22 +133,29 @@ class PenPathPainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.round
       ..style = PaintingStyle.stroke;
 
-    final path = Path();
+    // Create separate paths for each stroke to avoid connecting lines
+    final List<Path> strokePaths = [];
+    Path? currentPath;
 
     for (int i = 0; i < afdots.length; i++) {
       final Afdot dot = afdots[i];
       final Offset offset = _getScaledOffset(dot, size);
 
       if (dot.type == 1) {
+        // Pen down - start or continue stroke
         if (i == 0 || afdots[i - 1].type == 2) {
-          path.moveTo(offset.dx, offset.dy);
-        } else {
+          // Start a new stroke
+          currentPath = Path();
+          currentPath.moveTo(offset.dx, offset.dy);
+          strokePaths.add(currentPath);
+        } else if (currentPath != null) {
+          // Continue current stroke with smooth curve
           final previousOffset = _getScaledOffset(afdots[i - 1], size);
           final midPoint = Offset(
             (previousOffset.dx + offset.dx) / 2,
             (previousOffset.dy + offset.dy) / 2,
           );
-          path.quadraticBezierTo(
+          currentPath.quadraticBezierTo(
             previousOffset.dx,
             previousOffset.dy,
             midPoint.dx,
@@ -156,9 +163,14 @@ class PenPathPainter extends CustomPainter {
           );
         }
       }
+      // Note: We don't need to handle type 2 (pen up) explicitly here
+      // as it's already handled by the condition above
     }
 
-    canvas.drawPath(path, paint);
+    // Draw all stroke paths
+    for (final path in strokePaths) {
+      canvas.drawPath(path, paint);
+    }
   }
 
   Offset _getScaledOffset(Afdot dot, Size size) {

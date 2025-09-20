@@ -17,6 +17,8 @@ import 'package:Medikalam/services/api/appointment/appointment_repo_impl.dart'
     as _i1009;
 import 'package:Medikalam/services/api/attachments/attachment_repo.dart'
     as _i83;
+import 'package:Medikalam/services/api/attachments/attachment_repo_impl.dart'
+    as _i239;
 import 'package:Medikalam/services/api/auth/auth_repo.dart' as _i137;
 import 'package:Medikalam/services/api/auth/auth_repo_impl.dart' as _i427;
 import 'package:Medikalam/services/api/care_guide/care_guide_repo_impl.dart'
@@ -76,6 +78,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1022.DashboardRepo>(() => _i70.DashboardRepoImpl());
     gh.lazySingleton<_i546.PrescriptionRepo>(
         () => _i636.PrescriptionRepoImpl());
+    gh.lazySingleton<_i83.AttachmentRepo>(() => _i239.AttachmentRepoImpl());
     gh.lazySingleton<_i458.AppointmentRepo>(() => _i1009.AppointmentRepoImpl());
     gh.lazySingleton<_i979.PageRepo>(() => _i451.PageRepoImpl());
     gh.lazySingleton<_i972.PatientRepo>(() => _i203.PatientRepoImpl());

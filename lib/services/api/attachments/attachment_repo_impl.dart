@@ -1,3 +1,6 @@
+// Package imports:
+import 'package:injectable/injectable.dart';
+
 // Project imports:
 import 'package:Medikalam/services/api/api_result.dart';
 import 'package:Medikalam/services/api/attachments/attachment_repo.dart';
@@ -7,7 +10,8 @@ import 'package:Medikalam/src/core/utils/helpers/helpers.dart';
 import 'dart:io';
 import 'package:dio/dio.dart';
 
-///Implements AuthRepo Abstract Interface
+///Implements AttachmentRepo Abstract Interface
+@LazySingleton(as: AttachmentRepo)
 class AttachmentRepoImpl implements AttachmentRepo {
   @override
   Future<ApiResult<Map<String, dynamic>>> upload() async {

@@ -16,6 +16,7 @@ import 'package:Medikalam/src/core/utils/constants/extensions.dart';
 import 'package:Medikalam/src/providers/auth/auth_provider.dart';
 import 'package:Medikalam/src/views/widgets/bottomsheet/upload_bottomsheet.dart';
 import 'package:Medikalam/src/views/widgets/custom_container/custom_container_widget.dart';
+import 'package:Medikalam/src/views/mixins/pen_connection_mixin.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -24,7 +25,8 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends State<ProfilePage>
+    with PenConnectionMixin<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

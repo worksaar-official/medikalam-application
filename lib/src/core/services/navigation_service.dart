@@ -16,6 +16,8 @@ class NavigationService {
   NavigationService._();
 
   BuildContext? _currentContext;
+  DateTime? _lastNavigationAt;
+  bool _isNavigating = false;
 
   /// Set the current context for navigation
   void setContext(BuildContext context) {
@@ -52,6 +54,15 @@ class NavigationService {
       final current = currentRoute;
       // Avoid pushing again if we are already on the page
       if (current != AppScreens.prescriptionPaper.path) {
+        // Throttle to avoid stacking navigation on rapid pen events
+        final now = DateTime.now();
+        if (_isNavigating ||
+            (_lastNavigationAt != null &&
+                now.difference(_lastNavigationAt!).inMilliseconds < 1200)) {
+          logger.i('NAVIGATION_SERVICE: Throttling navigation');
+          return;
+        }
+        _isNavigating = true;
         logger.i('NAVIGATION_SERVICE: Auto-navigating to prescription paper');
         try {
           _currentContext!.push(AppScreens.prescriptionPaper.path);
@@ -64,6 +75,10 @@ class NavigationService {
             logger.e('NAVIGATION_SERVICE: Both navigation attempts failed: $e');
           }
         }
+        _lastNavigationAt = DateTime.now();
+        Future.delayed(const Duration(milliseconds: 600), () {
+          _isNavigating = false;
+        });
       } else {
         logger.i(
             'NAVIGATION_SERVICE: Already on prescription paper, no navigation');

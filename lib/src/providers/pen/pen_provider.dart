@@ -48,6 +48,11 @@ class PenProvider extends ChangeNotifier {
   bool get shouldAutoReconnect =>
       savedPenMacAddress != null && _connectedPen == null;
 
+  // Connection retry mechanism
+  int _connectionRetryCount = 0;
+  static const int _maxRetryAttempts = 3;
+  static const Duration _retryDelay = Duration(seconds: 2);
+
   @override
   void dispose() {
     _penEventStreamController.close();
@@ -81,10 +86,7 @@ class PenProvider extends ChangeNotifier {
       if (_connectedPen == null && savedMacAddress == penEvent.macAddress) {
         logger.i(
             'PEN_AUTO_CONNECT: Auto-connecting to previously connected pen - MAC: ${penEvent.macAddress}');
-        connect(penEvent.macAddress).catchError((error) {
-          logger.e(
-              'PEN_AUTO_CONNECT_FAILED: Failed to auto-connect - Error: $error');
-        });
+        _connectWithRetry(penEvent.macAddress);
       }
       notifyListeners();
     }
@@ -104,6 +106,9 @@ class PenProvider extends ChangeNotifier {
     _connectedPen = null;
     setShowSvg(false);
     showSuccess("Pen Disconnected");
+
+    // Reset connection retry count on disconnect
+    _connectionRetryCount = 0;
 
     // Reset auto-navigation flag when pen disconnects
     _resetAutoNavigationCallback?.call();
@@ -157,20 +162,59 @@ class PenProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Connect with retry mechanism for auto-reconnection
+  Future<void> _connectWithRetry(String macAddress) async {
+    if (_connectionRetryCount >= _maxRetryAttempts) {
+      logger.w(
+          'PEN_CONNECT_RETRY_EXHAUSTED: Max retry attempts reached for MAC: $macAddress');
+      _connectionRetryCount = 0;
+      return;
+    }
+
+    _connectionRetryCount++;
+    logger.i(
+        'PEN_CONNECT_RETRY: Attempt $_connectionRetryCount/$_maxRetryAttempts for MAC: $macAddress');
+
+    try {
+      await connect(macAddress);
+      _connectionRetryCount = 0; // Reset on success
+    } catch (e) {
+      logger.e(
+          'PEN_CONNECT_RETRY_FAILED: Attempt $_connectionRetryCount failed - Error: $e');
+
+      if (_connectionRetryCount < _maxRetryAttempts) {
+        logger.i(
+            'PEN_CONNECT_RETRY_DELAY: Waiting ${_retryDelay.inSeconds}s before retry...');
+        await Future.delayed(_retryDelay);
+        _connectWithRetry(macAddress);
+      } else {
+        logger.e(
+            'PEN_CONNECT_RETRY_EXHAUSTED: All retry attempts failed for MAC: $macAddress');
+        _connectionRetryCount = 0;
+      }
+    }
+  }
+
   Future<void> connect(String macAddress) async {
     logger.i('PEN_CONNECT: Attempting to connect to pen - MAC: $macAddress');
     try {
+      // Don't set connected state until hardware connection is confirmed
+      await DPenCtrl.connect(macAddress);
+
+      // Only set connected state after successful hardware connection
       setConnectedPen(PenEvent(
           macAddress: macAddress, deviceName: '', rssi: 0, penMsgType: 0));
       _penEventStreamController.add(macAddress);
-      showSuccess("Connected to Pen $macAddress");
-      await DPenCtrl.connect(macAddress);
       Helpers.setString(key: Keys.connectedPenMac, value: macAddress);
+      showSuccess("Connected to Pen $macAddress");
       logger.i(
           'PEN_CONNECT_SUCCESS: Successfully connected to pen - MAC: $macAddress');
     } catch (e) {
       logger.e(
           'PEN_CONNECT_FAILED: Failed to connect to pen - MAC: $macAddress, Error: $e');
+      // Reset connection state on failure
+      _connectedPen = null;
+      notifyListeners();
       rethrow;
     }
   }
@@ -201,6 +245,20 @@ class PenProvider extends ChangeNotifier {
         logger.w(
             'PEN_STATE_SYNC: Hardware says disconnected but we think connected, syncing...');
         penDisconnected();
+      } else if (isConnected && _connectedPen == null) {
+        // Hardware says connected but our state says disconnected
+        // This can happen after hot reload - try to restore connection state
+        final savedMac = savedPenMacAddress;
+        if (savedMac != null) {
+          logger.i(
+              'PEN_STATE_SYNC: Hardware connected but app state disconnected, restoring state for MAC: $savedMac');
+          setConnectedPen(PenEvent(
+            macAddress: savedMac,
+            deviceName: 'Restored Connection',
+            rssi: -100,
+            penMsgType: 0,
+          ));
+        }
       }
 
       return isConnected;

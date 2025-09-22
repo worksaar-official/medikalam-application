@@ -17,6 +17,7 @@ import 'package:Medikalam/src/core/utils/constants/colors.dart';
 import 'package:Medikalam/src/core/utils/constants/constant.dart';
 import 'package:Medikalam/src/core/utils/constants/extensions.dart';
 import 'package:Medikalam/src/providers/dashboard/dashboard_provider.dart';
+import 'package:Medikalam/src/models/pen/pen_event.dart';
 import 'package:Medikalam/src/providers/pen/pen_provider.dart';
 import 'package:Medikalam/src/providers/permission/permission_provider.dart';
 import 'package:Medikalam/src/providers/prescription/prescription_provider.dart';
@@ -89,7 +90,76 @@ class _DashboardScreenState extends State<DashboardScreen>
         logger.i(
             'DASHBOARD: Auto-reconnection ready. Pen will connect when cap is opened.');
       }
+
+      // Check if pen is already connected after hot reload/restart
+      _checkPenConnectionAfterHotReload(penProvider);
+
+      // Reset auto-navigation lock when returning to dashboard
+      _resetAutoNavigationLock();
     });
+  }
+
+  /// Check if pen is already connected after hot reload/restart
+  /// and setup auto navigation if needed
+  Future<void> _checkPenConnectionAfterHotReload(
+      PenProvider penProvider) async {
+    try {
+      // Check hardware connection status
+      final isHardwareConnected =
+          await penProvider.checkHardwareConnectionStatus();
+
+      if (isHardwareConnected && !penProvider.isConnected) {
+        logger.i(
+            'DASHBOARD: Pen is connected at hardware level but not in app state, syncing...');
+
+        // Get the saved MAC address
+        final savedMac = penProvider.savedPenMacAddress;
+        if (savedMac != null) {
+          // Restore the connection state
+          penProvider.setConnectedPen(PenEvent(
+            macAddress: savedMac,
+            deviceName: 'Previously Connected Pen',
+            rssi: -100,
+            penMsgType: 0,
+          ));
+
+          logger
+              .i('DASHBOARD: Restored pen connection state for MAC: $savedMac');
+
+          // Start listeners to enable auto navigation
+          startListener();
+
+          logger
+              .i('DASHBOARD: Auto navigation is now enabled for connected pen');
+        }
+      } else if (penProvider.isConnected) {
+        logger.i(
+            'DASHBOARD: Pen is already connected, ensuring auto navigation is enabled');
+
+        // Ensure listeners are started for auto navigation
+        startListener();
+
+        logger.i(
+            'DASHBOARD: Auto navigation confirmed enabled for connected pen');
+      } else {
+        logger.i(
+            'DASHBOARD: No pen connected, auto navigation will be enabled when pen connects');
+      }
+    } catch (e) {
+      logger.e('DASHBOARD: Error checking pen connection after hot reload: $e');
+    }
+  }
+
+  /// Reset auto-navigation lock when returning to dashboard
+  void _resetAutoNavigationLock() {
+    try {
+      // Reset the auto-navigation lock in the pen connection mixin
+      // This ensures that auto-navigation can work again when user writes
+      resetAutoNavigation();
+      logger.i('DASHBOARD: Auto-navigation lock reset');
+    } catch (e) {
+      logger.e('DASHBOARD: Error resetting auto-navigation lock: $e');
+    }
   }
 
   @override

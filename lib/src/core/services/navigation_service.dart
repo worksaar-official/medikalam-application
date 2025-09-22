@@ -53,7 +53,17 @@ class NavigationService {
       // Avoid pushing again if we are already on the page
       if (current != AppScreens.prescriptionPaper.path) {
         logger.i('NAVIGATION_SERVICE: Auto-navigating to prescription paper');
-        _currentContext!.push(AppScreens.prescriptionPaper.path);
+        try {
+          _currentContext!.push(AppScreens.prescriptionPaper.path);
+        } catch (_) {
+          // Fallback to GoRouter context access if direct push fails
+          try {
+            GoRouter.of(_currentContext!)
+                .push(AppScreens.prescriptionPaper.path);
+          } catch (e) {
+            logger.e('NAVIGATION_SERVICE: Both navigation attempts failed: $e');
+          }
+        }
       } else {
         logger.i(
             'NAVIGATION_SERVICE: Already on prescription paper, no navigation');

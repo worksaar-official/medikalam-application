@@ -37,9 +37,14 @@ mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Keep navigation context fresh when the widget's dependencies change
+    NavigationService.instance.setContext(context);
+  }
+
+  @override
   void dispose() {
-    // Clear navigation context when widget is disposed
-    NavigationService.instance.clearContext();
     super.dispose();
   }
 

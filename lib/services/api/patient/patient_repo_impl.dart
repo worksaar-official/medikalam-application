@@ -98,7 +98,7 @@ class PatientRepoImpl implements PatientRepo {
           'pageNumber': pageNumber,
           'fullName': form.control('name').value,
           'gender': form.control('gender').value,
-          'mobileNumber':  form.control('mobileNumber').value,
+          'mobileNumber': form.control('mobileNumber').value,
           // 'email': 'johndoe@example.com',
         },
       );
@@ -217,7 +217,7 @@ class PatientRepoImpl implements PatientRepo {
   }
 
   @override
-  Future<ApiResult<bool>> delete(String id) async{
+  Future<ApiResult<bool>> delete(String id) async {
     try {
       final response = await Helpers.sendRequest(
         RequestType.delete,
@@ -232,8 +232,7 @@ class PatientRepoImpl implements PatientRepo {
       }
       return ApiResult.failure(
           error: ServerException(message: response?["message"]));
-      
-    }on ServerException catch (e) {
+    } on ServerException catch (e) {
       return ApiResult.failure(
         error: ServerException(code: e.code, message: e.message),
       );

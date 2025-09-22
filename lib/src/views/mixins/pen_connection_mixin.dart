@@ -15,14 +15,16 @@ import 'package:Medikalam/src/models/pen/pen_event.dart';
 import 'package:Medikalam/src/providers/pen/pen_provider.dart';
 import 'package:Medikalam/src/providers/prescription/prescription_provider.dart';
 import 'package:Medikalam/src/core/services/navigation_service.dart';
+import 'package:Medikalam/src/core/utils/constants/keys.dart';
+import 'package:Medikalam/src/core/utils/helpers/helpers.dart';
 
 mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
   late PenProvider _penProvider;
   PrescriptionProvider get _prescriptionProvider =>
       context.read<PrescriptionProvider>();
 
-  // Flag to track if auto-navigation has already occurred for this session
-  bool _hasAutoNavigated = false;
+  // Deprecated flag (kept for backwards compatibility, no longer used)
+  // bool _hasAutoNavigated = false;
 
   @override
   void initState() {
@@ -186,8 +188,8 @@ mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
       logger.d(
           "PEN_DOT_EVENT: Pen dot event - X: ${object['x']}, Y: ${object['y']}, Page: ${object['page']}");
 
-      // Auto-navigate to prescription page if user is on dashboard and pen is connected
-      _handleAutoNavigation();
+      // Auto-navigate to prescription page from ANY screen when the pen writes
+      _handleAutoNavigateToPrescriptionPaper();
 
       _prescriptionProvider.getSymbolName(double.parse(object['x'].toString()),
           double.parse(object['y'].toString()));
@@ -213,29 +215,48 @@ mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
     }
   }
 
+  /// Debounced auto navigation guard
+  bool _penAutoNavLock = false;
+  DateTime? _lastPenNavAt;
+
   /// Handle automatic navigation to prescription page when user starts writing
-  void _handleAutoNavigation() {
-    // Only auto-navigate once per session and if pen is connected
-    if (_hasAutoNavigated || !_penProvider.isConnected) {
+  /// from ANY screen. Requires: user logged in and pen connected.
+  void _handleAutoNavigateToPrescriptionPaper() {
+    // Require pen connection
+    if (!_penProvider.isConnected) return;
+
+    // Require login
+    final isLoggedIn = Helpers.getString(key: Keys.token) != null;
+    if (!isLoggedIn) return;
+
+    // Debounce to prevent multiple navigations from frequent dot events
+    final now = DateTime.now();
+    if (_penAutoNavLock &&
+        _lastPenNavAt != null &&
+        now.difference(_lastPenNavAt!).inMilliseconds < 1500) {
       return;
     }
+    _penAutoNavLock = true;
+    _lastPenNavAt = now;
 
-    // Check if user is on dashboard
-    if (NavigationService.instance.isOnDashboard) {
-      logger.i(
-          "PEN_AUTO_NAV: User started writing on dashboard, auto-navigating to prescription page");
-      _hasAutoNavigated = true;
+    logger.i(
+        "PEN_AUTO_NAV: Dot detected, navigating to prescription paper from any screen");
 
-      // Set isScan to false before navigation
-      _prescriptionProvider.isScan = false;
+    // Ensure scanning mode is disabled before entering drawing screen
+    _prescriptionProvider.isScan = false;
 
-      // Navigate to prescription page
-      NavigationService.instance.navigateToPrescriptionPaper();
-    }
+    // Global navigation
+    NavigationService.instance.navigateToPrescriptionPaper();
+
+    // Release lock after a short delay
+    Future.delayed(const Duration(milliseconds: 800), () {
+      _penAutoNavLock = false;
+    });
   }
 
   /// Reset auto-navigation flag (can be called when pen disconnects)
   void resetAutoNavigation() {
-    _hasAutoNavigated = false;
+    // No-op with new debounced logic; kept for backward compatibility
+    _penAutoNavLock = false;
   }
 }

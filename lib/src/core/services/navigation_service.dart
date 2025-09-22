@@ -39,22 +39,25 @@ class NavigationService {
     return currentRoute == AppScreens.dashboard.path;
   }
 
-  /// Navigate to prescription paper automatically
+  /// Navigate to prescription paper automatically from ANYWHERE
+  /// Ensures we don't attempt navigation without a context and avoids
+  /// stacking the same route repeatedly.
   Future<void> navigateToPrescriptionPaper() async {
     if (_currentContext == null) {
       logger.w('NAVIGATION_SERVICE: No context available for navigation');
       return;
     }
 
-    if (!isOnDashboard) {
-      logger.i(
-          'NAVIGATION_SERVICE: User not on dashboard, skipping auto-navigation');
-      return;
-    }
-
     try {
-      logger.i('NAVIGATION_SERVICE: Auto-navigating to prescription paper');
-      _currentContext!.push(AppScreens.prescriptionPaper.path);
+      final current = currentRoute;
+      // Avoid pushing again if we are already on the page
+      if (current != AppScreens.prescriptionPaper.path) {
+        logger.i('NAVIGATION_SERVICE: Auto-navigating to prescription paper');
+        _currentContext!.push(AppScreens.prescriptionPaper.path);
+      } else {
+        logger.i(
+            'NAVIGATION_SERVICE: Already on prescription paper, no navigation');
+      }
     } catch (e) {
       logger.e(
           'NAVIGATION_SERVICE: Failed to navigate to prescription paper: $e');

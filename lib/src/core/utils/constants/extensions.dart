@@ -48,6 +48,7 @@ extension Date on String {
   String get formattedDate {
     return DateFormat('dd/MM/yyyy').format(DateTime.parse(this));
   }
+
   String get date {
     final parts = split(",");
     return parts.isNotEmpty ? parts[0].trim() : 'Invalid date';

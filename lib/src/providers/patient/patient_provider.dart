@@ -33,6 +33,10 @@ class PatientProvider extends CentralizedProvider<PatientResponse> {
 
   //Variable
   List<PatientCase> cases = [];
+  List<Document> documents = [];
+  List<Document> normalReports = [];
+  List<Document> reports = [];
+  List<Document> scanDocuments = [];
   ViewCaseModel caseDetails = ViewCaseModel(data: ViewCaseData.empty());
   Status detailsStatus = Status.initial;
   Status caseStatus = Status.initial;
@@ -67,6 +71,29 @@ class PatientProvider extends CentralizedProvider<PatientResponse> {
   void updateDate(DateTime value) {
     form.control('dateofbirth').updateValue(value);
     notifyListeners();
+  }
+
+  void _categorizeDocuments(List<Document> docs) {
+    normalReports.clear();
+    reports.clear();
+    scanDocuments.clear();
+
+    for (var doc in docs) {
+      // Categorize based on document title or type
+      if (doc.title.toLowerCase().contains('normal report') ||
+          doc.title.toLowerCase().contains('normal')) {
+        normalReports.add(doc);
+      } else if (doc.title.toLowerCase().contains('report') &&
+          !doc.title.toLowerCase().contains('normal')) {
+        reports.add(doc);
+      } else if (doc.title.toLowerCase().contains('scan') ||
+          doc.title.toLowerCase().contains('document')) {
+        scanDocuments.add(doc);
+      } else {
+        // Default to reports if no specific category matches
+        reports.add(doc);
+      }
+    }
   }
 
   void setCaseStatus(Status status) {
@@ -199,12 +226,52 @@ class PatientProvider extends CentralizedProvider<PatientResponse> {
   Future<void> viewPatient(String id) async {
     try {
       cases = [];
+      documents = [];
       detailsStatus = Status.loading;
       notifyListeners();
       final data = await _repo.viewpatient(patientId: id);
       data.when(
         success: (success) {
           cases = success.data.patientCases;
+
+          // In real implementation, documents would come from API
+          // For now, using sample data that simulates API response
+          documents = [
+            const Document(
+              title: "Normal Report - Blood Test",
+              type: "pdf",
+              url: "https://example.com/normal-report.pdf",
+            ),
+            const Document(
+              title: "Normal Report - X-Ray",
+              type: "pdf",
+              url: null, // No data available
+            ),
+            const Document(
+              title: "Medical Report - Cardiology",
+              type: "pdf",
+              url: "https://example.com/cardiology-report.pdf",
+            ),
+            const Document(
+              title: "Lab Report - Biochemistry",
+              type: "pdf",
+              url: null, // No data available
+            ),
+            const Document(
+              title: "Scan Document - MRI",
+              type: "pdf",
+              url: "https://example.com/mri-scan.pdf",
+            ),
+            const Document(
+              title: "Scan Document - CT Scan",
+              type: "pdf",
+              url: null, // No data available
+            ),
+          ];
+
+          // Categorize documents
+          _categorizeDocuments(documents);
+
           detailsStatus = Status.success;
           notifyListeners();
         },

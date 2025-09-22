@@ -45,7 +45,8 @@ class PrescriptionRepoImpl implements PrescriptionRepo {
   }
 
   @override
-  Future<ApiResult<MediaResponse>> uploadMedia(String pageId,File mediaFile) async {
+  Future<ApiResult<MediaResponse>> uploadMedia(
+      String pageId, File mediaFile) async {
     try {
       final formData = FormData.fromMap({
         'pageId': pageId,

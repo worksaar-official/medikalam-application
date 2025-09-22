@@ -17,6 +17,7 @@ import 'package:Medikalam/src/providers/prescription/prescription_provider.dart'
 import 'package:Medikalam/src/core/services/navigation_service.dart';
 import 'package:Medikalam/src/core/utils/constants/keys.dart';
 import 'package:Medikalam/src/core/utils/helpers/helpers.dart';
+import 'package:Medikalam/services/routing/utils/extensions/screen_name_extension.dart';
 
 mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
   late PenProvider _penProvider;
@@ -227,20 +228,21 @@ mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
   /// Handle automatic navigation to prescription page when user starts writing
   /// from ANY screen. Requires: user logged in and pen connected.
   void _handleAutoNavigateToPrescriptionPaper() {
-    // Require pen connection
-    if (!_penProvider.isConnected) return;
-
-    // Require login
-    final isLoggedIn = Helpers.getString(key: Keys.token) != null;
-    if (!isLoggedIn) return;
+    // Check if auto-navigation should be enabled
+    if (!isAutoNavigationEnabled) {
+      logger.i("PEN_AUTO_NAV: Auto-navigation disabled, skipping");
+      return;
+    }
 
     // Debounce to prevent multiple navigations from frequent dot events
     final now = DateTime.now();
     if (_penAutoNavLock &&
         _lastPenNavAt != null &&
         now.difference(_lastPenNavAt!).inMilliseconds < 1500) {
+      logger.i("PEN_AUTO_NAV: Navigation throttled, skipping");
       return;
     }
+
     _penAutoNavLock = true;
     _lastPenNavAt = now;
 
@@ -256,12 +258,33 @@ mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
     // Release lock after a short delay
     Future.delayed(const Duration(milliseconds: 800), () {
       _penAutoNavLock = false;
+      logger.i("PEN_AUTO_NAV: Navigation lock released");
     });
   }
 
   /// Reset auto-navigation flag (can be called when pen disconnects)
   void resetAutoNavigation() {
-    // No-op with new debounced logic; kept for backward compatibility
     _penAutoNavLock = false;
+    _lastPenNavAt = null;
+    logger.i("PEN_AUTO_NAV: Auto-navigation lock reset");
+  }
+
+  /// Check if auto-navigation should be enabled
+  bool get isAutoNavigationEnabled {
+    // Check if pen is connected
+    if (!_penProvider.isConnected) return false;
+
+    // Check if user is logged in
+    final isLoggedIn = Helpers.getString(key: Keys.token) != null;
+    if (!isLoggedIn) return false;
+
+    // Check if we're not already on prescription page
+    final currentRoute = NavigationService.instance.currentRoute;
+    if (currentRoute == AppScreens.prescriptionPaper.path) return false;
+
+    // Check if auto-navigation is not locked
+    if (_penAutoNavLock) return false;
+
+    return true;
   }
 }

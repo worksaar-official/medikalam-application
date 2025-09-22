@@ -63,15 +63,14 @@ class NavigationService {
           return;
         }
         _isNavigating = true;
-        logger.i(
-            'NAVIGATION_SERVICE: Auto-navigating to prescription paper (replace)');
+        logger.i('NAVIGATION_SERVICE: Auto-navigating to prescription paper');
         try {
-          // Replace current route to avoid stacking multiple entries
-          GoRouter.of(_currentContext!).go(AppScreens.prescriptionPaper.path);
+          _currentContext!.push(AppScreens.prescriptionPaper.path);
         } catch (_) {
           // Fallback to GoRouter context access if direct push fails
           try {
-            GoRouter.of(_currentContext!).go(AppScreens.prescriptionPaper.path);
+            GoRouter.of(_currentContext!)
+                .push(AppScreens.prescriptionPaper.path);
           } catch (e) {
             logger.e('NAVIGATION_SERVICE: Both navigation attempts failed: $e');
           }

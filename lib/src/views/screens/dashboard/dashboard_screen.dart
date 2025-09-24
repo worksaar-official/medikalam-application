@@ -62,10 +62,14 @@ class _DashboardScreenState extends State<DashboardScreen>
 
           // If it's a restart_scanning event or regular pen connection
           if (event == "restart_scanning") {
-            logger.i('DASHBOARD: Restarting BLE scanning after disconnect');
-            startListener();
-            startBle(
-                clear: true); // Clear previous pen list and restart scanning
+            logger.i(
+                'DASHBOARD: Restarting BLE scanning after disconnect with delay');
+            // Add delay before restarting to prevent rapid reconnection attempts
+            Future.delayed(Duration(seconds: 3), () {
+              startListener();
+              startBle(
+                  clear: true); // Clear previous pen list and restart scanning
+            });
           } else {
             // Regular pen connection event
             startListener();

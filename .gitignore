@@ -7,3 +7,50 @@
 .DS_Store
 .DS_Store
 .DS_Store
+# Additional exclusions
+# Credentials / env
+.env
+.env.*
+*.env
+*.secret
+secrets/**
+# Logs
+*.log
+logs/**
+# Crashlytics/Firebase
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+# IntelliJ/Android Studio
+.gradle/
+.cxx/
+.idea/**
+*.ipr
+*.iws
+# Xcode user data and derived data
+ios/Runner.xcodeproj/project.xcworkspace/
+ios/Runner.xcodeproj/xcuserdata/
+ios/Runner.xcworkspace/xcuserdata/
+DerivedData/
+# CocoaPods artifacts
+ios/Podfile.lock
+# Flutter / Dart extra
+.flutter-versions
+pubspec.lock
+# Coverage and reports
+coverage/**
+reports/**
+# Local caches
+.melos_tool/**
+.dartServer/**
+.dart_tool/**
+# macOS/Linux junk
+*.swp
+*.swo
+*~
+# Windows junk
+*.lnk
+Thumbs.db
+# Build intermediates
+android/app/build/
+android/build/
+ios/build/

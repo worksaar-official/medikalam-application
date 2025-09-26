@@ -191,7 +191,7 @@ class PenPathPainter extends CustomPainter {
             }
           }
 
-          // Reset current path for next stroke
+          // Reset current path for next stroke hi
           currentPath = null;
         }
       }

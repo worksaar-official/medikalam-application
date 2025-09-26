@@ -44,19 +44,19 @@ class _PrescriptionPaperState extends State<PrescriptionPaper>
   @override
   void initState() {
     super.initState();
-    logger.i("PRESCRIPTION_PAPER_INIT: Widget initialized");
+    // logger.i("PRESCRIPTION_PAPER_INIT: Widget initialized");
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      logger.i("PRESCRIPTION_PAPER_POST_FRAME: Post frame callback executed");
+      // logger.i("PRESCRIPTION_PAPER_POST_FRAME: Post frame callback executed");
       prescriptionProvider = context.read<PrescriptionProvider>();
       prescriptionProvider.pageDetails = PageDetails.fromJson(
           jsonDecode(await CacheUtils.getCached(Keys.pageConfig) ?? '{}'));
       prescriptionProvider.setTimelyUploads();
-      logger.i("PRESCRIPTION_PAPER_POST_FRAME: Provider setup completed");
+      // logger.i("PRESCRIPTION_PAPER_POST_FRAME: Provider setup completed");
 
       // Log current navigation state
       final currentRoute = GoRouterState.of(context).uri.path;
-      logger.i(
-          "PRESCRIPTION_PAPER_NAV_STATE: Current route after init: $currentRoute");
+      // logger.i(
+      //     "PRESCRIPTION_PAPER_NAV_STATE: Current route after init: $currentRoute");
     });
   }
 
@@ -83,7 +83,7 @@ class _PrescriptionPaperState extends State<PrescriptionPaper>
           backgroundColor: Colors.transparent,
           leading: GestureDetector(
             onTap: () {
-              logger.i("BACK_BUTTON_TAP: Custom app bar back button tapped");
+              // logger.i("BACK_BUTTON_TAP: Custom app bar back button tapped");
               _handleBackNavigation(context);
             },
             child: Padding(
@@ -100,42 +100,42 @@ class _PrescriptionPaperState extends State<PrescriptionPaper>
 
   /// Handle back navigation - simplified for single press
   void _handleBackNavigation(BuildContext context) {
-    logger.i("BACK_NAV_START: Back button pressed on PrescriptionPaper");
+    // logger.i("BACK_NAV_START: Back button pressed on PrescriptionPaper");
 
     // Get current route information
     final currentLocation = GoRouterState.of(context).uri.path;
     final canPop = context.canPop();
 
-    logger.i("BACK_NAV_INFO: Current route: $currentLocation");
-    logger.i("BACK_NAV_INFO: Can pop: $canPop");
+    // logger.i("BACK_NAV_INFO: Current route: $currentLocation");
+    // logger.i("BACK_NAV_INFO: Can pop: $canPop");
 
     // Check navigation stack depth
     final router = GoRouter.of(context);
-    logger.i(
-        "BACK_NAV_INFO: Router state: ${router.routerDelegate.currentConfiguration}");
+    // logger.i(
+    //     "BACK_NAV_INFO: Router state: ${router.routerDelegate.currentConfiguration}");
 
     try {
       if (canPop) {
-        logger.i("BACK_NAV_ACTION: Attempting to pop current route");
+        // logger.i("BACK_NAV_ACTION: Attempting to pop current route");
         context.pop();
-        logger.i("BACK_NAV_SUCCESS: Successfully popped route");
+        // logger.i("BACK_NAV_SUCCESS: Successfully popped route");
       } else {
-        logger.i("BACK_NAV_ACTION: Cannot pop, navigating to dashboard");
+        // logger.i("BACK_NAV_ACTION: Cannot pop, navigating to dashboard");
         context.go(AppScreens.dashboard.path);
-        logger.i("BACK_NAV_SUCCESS: Successfully navigated to dashboard");
+        // logger.i("BACK_NAV_SUCCESS: Successfully navigated to dashboard");
       }
     } catch (e, stackTrace) {
-      logger.e("BACK_NAV_ERROR: Navigation failed: $e");
-      logger.e("BACK_NAV_ERROR: Stack trace: $stackTrace");
+      // logger.e("BACK_NAV_ERROR: Navigation failed: $e");
+      // logger.e("BACK_NAV_ERROR: Stack trace: $stackTrace");
 
       // Fallback navigation
       try {
-        logger.i("BACK_NAV_FALLBACK: Attempting fallback navigation");
+        // logger.i("BACK_NAV_FALLBACK: Attempting fallback navigation");
         context.go(AppScreens.dashboard.path);
-        logger.i("BACK_NAV_FALLBACK: Fallback navigation successful");
+        // logger.i("BACK_NAV_FALLBACK: Fallback navigation successful");
       } catch (fallbackError) {
-        logger.e(
-            "BACK_NAV_FALLBACK_ERROR: Fallback navigation also failed: $fallbackError");
+        // logger.e(
+        //     "BACK_NAV_FALLBACK_ERROR: Fallback navigation also failed: $fallbackError");
       }
     }
   }
@@ -359,8 +359,8 @@ class _PrescriptionPaperState extends State<PrescriptionPaper>
                       ? AppColors.txtSecondary
                       : AppColors.btnPrimary,
                   onTap: () async {
-                    logger.i(
-                        "NAV_LINK_PATIENT: Navigating to patient landing to link patient");
+                    // logger.i(
+                    //     "NAV_LINK_PATIENT: Navigating to patient landing to link patient");
                     context.pushNamed(
                       AppScreens.patientLanding.name,
                       extra: {

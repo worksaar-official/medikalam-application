@@ -83,14 +83,18 @@ class PrescriptionCard extends CustomPainter {
     final paint = Paint()
       ..strokeWidth = 1.5
       ..color = Colors.black
+      ..strokeCap = StrokeCap.round // Add this for better dot rendering
+      ..strokeJoin = StrokeJoin.round
+      ..isAntiAlias = true
       ..style = PaintingStyle.stroke;
 
-    if (points.length < 2) {
-      return; // Not enough points to draw
+    if (points.isEmpty) {
+      return; // No points to draw
     }
 
     // Create separate paths for each stroke to avoid connecting lines
     final List<Path> strokePaths = [];
+    final List<Offset> isolatedDots = []; // Track isolated dots
     Path? currentPath;
 
     for (int i = 0; i < points.length; i++) {
@@ -109,25 +113,72 @@ class PrescriptionCard extends CustomPainter {
           // Continue current stroke with smooth curve
           final previousOffset =
               _getScaledOffset(imageHeight, imageWidth, size, points[i - 1]);
-          final midPoint = Offset(
-            (previousOffset.dx + offset.dx) / 2,
-            (previousOffset.dy + offset.dy) / 2,
-          );
-          currentPath.quadraticBezierTo(
-            previousOffset.dx,
-            previousOffset.dy,
-            midPoint.dx,
-            midPoint.dy,
-          );
+
+          // Check if this is a very short movement (likely a dot or small stroke)
+          final distance = (offset - previousOffset).distance;
+          if (distance < paint.strokeWidth * 0.5) {
+            // For very short movements, just add a line to ensure visibility
+            currentPath.lineTo(offset.dx, offset.dy);
+          } else {
+            // For longer movements, use smooth curve
+            final midPoint = Offset(
+              (previousOffset.dx + offset.dx) / 2,
+              (previousOffset.dy + offset.dy) / 2,
+            );
+            currentPath.quadraticBezierTo(
+              previousOffset.dx,
+              previousOffset.dy,
+              midPoint.dx,
+              midPoint.dy,
+            );
+          }
+        }
+      } else if (point.actionType == 2) {
+        // Pen up - finalize current stroke and check if it's an isolated dot
+        if (currentPath != null) {
+          // Add the final point to complete the stroke
+          currentPath.lineTo(offset.dx, offset.dy);
+
+          // Check if this was an isolated dot
+          final pathMetrics = currentPath.computeMetrics();
+          for (final pathMetric in pathMetrics) {
+            if (pathMetric.length < paint.strokeWidth * 2) {
+              // This is likely an isolated dot (very short stroke)
+              final tangent = pathMetric.getTangentForOffset(0);
+              if (tangent != null) {
+                isolatedDots.add(tangent.position);
+              }
+            }
+          }
+
+          // Reset current path for next stroke
+          currentPath = null;
         }
       }
-      // Note: We don't need to handle actionType 2 (pen up) explicitly here
-      // as it's already handled by the condition above
+    }
+
+    // Handle case where the last point is a pen down (no pen up event)
+    if (currentPath != null && points.isNotEmpty) {
+      final lastPoint = points.last;
+      if (lastPoint.actionType == 1) {
+        final lastOffset =
+            _getScaledOffset(imageHeight, imageWidth, size, lastPoint);
+        currentPath.lineTo(lastOffset.dx, lastOffset.dy);
+      }
     }
 
     // Draw all stroke paths
     for (final path in strokePaths) {
       canvas.drawPath(path, paint);
+    }
+
+    // Draw isolated dots with a filled circle for better visibility
+    final dotPaint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.fill;
+
+    for (final dot in isolatedDots) {
+      canvas.drawCircle(dot, paint.strokeWidth / 2, dotPaint);
     }
   }
 

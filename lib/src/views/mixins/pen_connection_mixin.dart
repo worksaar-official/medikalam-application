@@ -195,7 +195,16 @@ mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
           "PEN_DOT_EVENT: Pen dot event - X: ${object['x']}, Y: ${object['y']}, Page: ${object['page']}");
 
       // Auto-navigate to prescription page from ANY screen when the pen writes
-      _handleAutoNavigateToPrescriptionPaper();
+      // _handleAutoNavigateToPrescriptionPaper();
+      // 🔧 ONLY auto-navigate if we're NOT on prescription page
+      final currentRoute = NavigationService.instance.currentRoute;
+      if (currentRoute != AppScreens.prescriptionPaper.path) {
+        // Auto-navigate to prescription page from ANY screen when the pen writes
+        _handleAutoNavigateToPrescriptionPaper();
+      } else {
+        logger
+            .d("PEN_AUTO_NAV: On prescription page, skipping auto-navigation");
+      }
 
       _prescriptionProvider.getSymbolName(double.parse(object['x'].toString()),
           double.parse(object['y'].toString()));
@@ -234,6 +243,15 @@ mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
       return;
     }
 
+    // 🔧 ADDITIONAL SAFETY CHECK: Double-check if we're already on prescription page
+    final currentRoute = NavigationService.instance.currentRoute;
+    logger.d("PEN_AUTO_NAV: Current route: $currentRoute");
+
+    if (currentRoute == AppScreens.prescriptionPaper.path) {
+      logger
+          .i("PEN_AUTO_NAV: Already on prescription page, skipping navigation");
+      return;
+    }
     // Debounce to prevent multiple navigations from frequent dot events
     final now = DateTime.now();
     if (_penAutoNavLock &&
@@ -272,7 +290,11 @@ mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
   /// Check if auto-navigation should be enabled
   bool get isAutoNavigationEnabled {
     // Check if pen is connected
-    if (!_penProvider.isConnected) return false;
+    // if (!_penProvider.isConnected) return false;
+    if (!_penProvider.isConnected) {
+      logger.d("PEN_AUTO_NAV: Pen not connected");
+      return false;
+    }
 
     // Check if user is logged in
     final isLoggedIn = Helpers.getString(key: Keys.token) != null;
@@ -280,7 +302,13 @@ mixin PenConnectionMixin<T extends StatefulWidget> on State<T> {
 
     // Check if we're not already on prescription page
     final currentRoute = NavigationService.instance.currentRoute;
-    if (currentRoute == AppScreens.prescriptionPaper.path) return false;
+    // if (currentRoute == AppScreens.prescriptionPaper.path) return false;
+    // Check if we're already on prescription page or any prescription-related page
+    if (currentRoute == AppScreens.prescriptionPaper.path ||
+        currentRoute?.contains('prescription') == true) {
+      logger.d("PEN_AUTO_NAV: Already on prescription page, auto-nav disabled");
+      return false;
+    }
 
     // Check if auto-navigation is not locked
     if (_penAutoNavLock) return false;

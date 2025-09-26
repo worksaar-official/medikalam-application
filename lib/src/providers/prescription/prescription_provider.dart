@@ -2,11 +2,10 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:io';
-
+import 'package:Medikalam/src/core/injection/injection.dart';
 // Project imports:
 import 'package:Medikalam/services/api/page/page_repo.dart';
 import 'package:Medikalam/services/api/prescription/prescription_repo.dart';
-import 'package:Medikalam/src/core/injection/injection.dart';
 import 'package:Medikalam/src/core/utils/constants/constant.dart';
 import 'package:Medikalam/src/core/utils/constants/extensions.dart';
 import 'package:Medikalam/src/core/utils/constants/keys.dart';
@@ -25,6 +24,7 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:injectable/injectable.dart';
+import 'package:Medikalam/src/providers/prescription/audio_provider.dart'; // ← Add this line
 
 @injectable
 class PrescriptionProvider with ChangeNotifier {
@@ -144,7 +144,7 @@ class PrescriptionProvider with ChangeNotifier {
         _uploadInterval, (_) => _flushPointQueueForPage(pageNum));
 
     _pageUploadActive[pageNum] = true;
-    logger.i("Started upload timer for page $pageNum");
+    // logger.i("Started upload timer for page $pageNum");
   }
 
   Future<void> _flushPointQueueForPage(int pageNum) async {
@@ -157,18 +157,18 @@ class PrescriptionProvider with ChangeNotifier {
       batch.add(queue.removeFirst());
     }
 
-    logger.d("Uploading ${batch.length} points for page $pageNum");
+    // logger.d("Uploading ${batch.length} points for page $pageNum");
 
     try {
       await _prescriptionRepo.uploadPoints(
         UploadPointRequest(pageNumber: pageNum, pointsToAdd: batch),
       );
-      logger
-          .i("Successfully uploaded ${batch.length} points for page $pageNum");
+      // logger
+      //     .i("Successfully uploaded ${batch.length} points for page $pageNum");
     } catch (e, s) {
       // Re-add to the correct page queue
       queue.addAll(batch);
-      logger.e("Failed to upload points for page $pageNum: $e");
+      // logger.e("Failed to upload points for page $pageNum: $e");
       debugPrintStack(stackTrace: s);
     }
   }
@@ -184,7 +184,9 @@ class PrescriptionProvider with ChangeNotifier {
     _pageDots[pageNum]!.add(dot);
     _pageQueues[pageNum]!.add(Points(x: dot.x, y: dot.y, actionType: dot.type));
 
-    logger.d("Dot added to page $pageNum: $dot");
+    // logger.d("Dot added to page $pageNum: $dot");
+    // 🔧 ADD THIS LINE - Symbol Detection
+    getSymbolName(dot.x, dot.y); //
 
     // Ensure uploads are running for this page
     if (_pageUploadActive[pageNum] != true ||
@@ -211,6 +213,8 @@ class PrescriptionProvider with ChangeNotifier {
   Future<void> addSymbols({Map<String, dynamic>? json}) async {
     final jsonSymbol = json ?? await Helpers.readJson();
     if (jsonSymbol != null) {
+      // debugPrint("Narayan Local symbol file loaded");
+      // debugPrint("JSON parameter keys: ${jsonSymbol.keys.toList()}");
       _symbols.clear(); // Clear existing symbols
       final rawSymbol = jsonSymbol['symbols'] as List;
       for (final data in rawSymbol) {
@@ -228,8 +232,17 @@ class PrescriptionProvider with ChangeNotifier {
   }
 
   void getSymbolName(double x, double y) {
+    // debugPrint("�� DEBUG: Checking coordinates X: $x, Y: $y");
+    // debugPrint("🔍 DEBUG: Total symbols loaded: ${_symbols.length}");
+
+    // 🎯 NEW: VOICE_START Bounds Check Function
+    checkVoiceStartBounds(x, y);
+
     for (final symbol in _symbols) {
+      // debugPrint(
+      //     "🔍 DEBUG: Checking symbol ${symbol.name} with bounds: xmin=${symbol.xmin}, xmax=${symbol.xmax}, ymin=${symbol.ymin}, ymax=${symbol.ymax}");
       if (symbol.isApplicableWithScaleFactor(x, y)) {
+        debugPrint("✅ DEBUG: Symbol ${symbol.name} MATCHED!");
         final now = DateTime.now();
 
         // Check if the symbol is the same as the last one and if enough time has passed
@@ -237,8 +250,8 @@ class PrescriptionProvider with ChangeNotifier {
           final timeDifference = now.difference(_lastSymbolTimestamp!);
 
           if (timeDifference < _symbolTimeout) {
-            debugPrint(
-                "Symbol ${symbol.name} detected again within timeout, skipping action.");
+            // debugPrint(
+            //     "Symbol ${symbol.name} detected again within timeout, skipping action.");
             return;
           }
         }
@@ -246,11 +259,118 @@ class PrescriptionProvider with ChangeNotifier {
         _lastSymbol = symbol.name;
         _lastSymbolTimestamp = now;
 
-        logger.d("Symbol Name : ${symbol.name}");
+        // logger.d("Symbol Name : ${symbol.name}");
         performActionBasedOnSymbolName(symbol.name);
         break;
+      } else {
+        // debugPrint("❌ DEBUG: Symbol ${symbol.name} did not match");
       }
     }
+  }
+
+  // 🎯 NEW: Dynamic Bounds Calculator
+  static List<Map<String, double>> _collectedCoordinates = [];
+
+  void checkVoiceStartBounds(double x, double y) {
+    // Collect coordinates for bounds calculation
+    _collectedCoordinates.add({"x": x, "y": y});
+    // Expected VOICE_START bounds
+    const double expectedXmin = 219.0;
+    const double expectedXmax = 242.0;
+    const double expectedYmin = 3096.0;
+    const double expectedYmax = 3313.0;
+
+    // Check if coordinates are within VOICE_START bounds
+    bool isWithinBounds = x >= expectedXmin &&
+        x <= expectedXmax &&
+        y >= expectedYmin &&
+        y <= expectedYmax;
+
+    // debugPrint("🎯 VOICE_START BOUNDS CHECK:");
+    // debugPrint("📍 Current coordinates: X=$x, Y=$y");
+    // debugPrint(
+    //     "📏 Expected bounds: X($expectedXmin-$expectedXmax), Y($expectedYmin-$expectedYmax)");
+
+    if (isWithinBounds) {
+      // debugPrint("✅ SUCCESS: Coordinates are WITHIN VOICE_START bounds!");
+      // debugPrint("🎤 Microphone should start recording now!");
+    } else {
+      // debugPrint("❌ FAILED: Coordinates are OUTSIDE VOICE_START bounds");
+      // debugPrint("💡 Move your pen within the blue rectangular area");
+
+      // Show which direction to move
+      if (x < expectedXmin) {
+        // debugPrint("➡️ Move RIGHT (X too small)");
+      } else if (x > expectedXmax) {
+        // debugPrint("⬅️ Move LEFT (X too large)");
+      }
+
+      if (y < expectedYmin) {
+        // debugPrint("⬇️ Move DOWN (Y too small)");
+      } else if (y > expectedYmax) {
+        // debugPrint("⬆️ Move UP (Y too large)");
+      }
+    }
+
+    // 🎯 NEW: Show formatted bounds for collected coordinates
+    generateFormattedBounds();
+
+    debugPrint("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  }
+
+  // 🎯 NEW: Generate Formatted Bounds Function
+  void generateFormattedBounds() {
+    if (_collectedCoordinates.isEmpty) return;
+
+    // Calculate min/max from collected coordinates
+    double xmin = _collectedCoordinates
+        .map((coord) => coord["x"]!)
+        .reduce((a, b) => a < b ? a : b);
+    double xmax = _collectedCoordinates
+        .map((coord) => coord["x"]!)
+        .reduce((a, b) => a > b ? a : b);
+    double ymin = _collectedCoordinates
+        .map((coord) => coord["y"]!)
+        .reduce((a, b) => a < b ? a : b);
+    double ymax = _collectedCoordinates
+        .map((coord) => coord["y"]!)
+        .reduce((a, b) => a > b ? a : b);
+
+    // Add buffer (5 units on each side)
+    double buffer = 5.0;
+    double finalXmin = xmin - buffer;
+    double finalXmax = xmax + buffer;
+    double finalYmin = ymin - buffer;
+    double finalYmax = ymax + buffer;
+
+    // debugPrint("🎯 FORMATTED BOUNDS GENERATED:");
+    // debugPrint("📊 Collected ${_collectedCoordinates.length} coordinates");
+    // debugPrint("📏 Raw Range: X($xmin-$xmax), Y($ymin-$ymax)");
+    // debugPrint("🎯 BUFFERED BOUNDS (+5 buffer):");
+    // debugPrint("   X: $finalXmin - $finalXmax");
+    // debugPrint("   Y: $finalYmin - $finalYmax");
+
+    // // Generate JSON format
+    // debugPrint("📋 COPY THIS JSON TO SYMBOLS FILE:");
+    // debugPrint('{');
+    // debugPrint('  "name": "VOICE_START",');
+    // debugPrint('  "bounds": {');
+    // debugPrint('    "ymin": $finalYmin,');
+    // debugPrint('    "xmin": $finalXmin,');
+    // debugPrint('    "ymax": $finalYmax,');
+    // debugPrint('    "xmax": $finalXmax');
+    // debugPrint('  },');
+    // debugPrint('  "id": 21,');
+    // debugPrint('  "type": "button"');
+    // debugPrint('}');
+
+    // debugPrint("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+  }
+
+  // 🎯 NEW: Clear collected coordinates
+  void clearCollectedCoordinates() {
+    _collectedCoordinates.clear();
+    debugPrint("🗑️ Collected coordinates cleared");
   }
 
   // ==================== Symbol Actions ====================
@@ -258,6 +378,7 @@ class PrescriptionProvider with ChangeNotifier {
     if (name.startsWith("KEYPAD_")) {
       handleKeypadActions(name);
     } else if (name.startsWith("VOICE_")) {
+      // debugPrint("Narayan VOICE ACTION: $name");
       handleVoiceActions(name);
     } else if (name.startsWith("ATTACHMENT_")) {
       handleAttachmentActions(name);
@@ -333,9 +454,13 @@ class PrescriptionProvider with ChangeNotifier {
     switch (name) {
       case "VOICE_START":
         debugPrint("Voice Start");
+        // Add this line to start recording:
+        getIt<AudioProvider>().startOrStopRecording(); // ← GetIt → getIt
         break;
       case "VOICE_STOP":
         debugPrint("Voice Stop");
+        // Add this line to stop recording:
+        getIt<AudioProvider>().startOrStopRecording();
         break;
       case "VOICE_SUBMIT":
         debugPrint("Voice Submit");
@@ -441,7 +566,7 @@ class PrescriptionProvider with ChangeNotifier {
 
     if (await file.exists()) {
       if (!force) {
-        logger.i("File already exists at: $filePath.");
+        // logger.i("File already exists at: $filePath.");
         return;
       }
     }
